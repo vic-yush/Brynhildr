@@ -1,3 +1,4 @@
+async-timeout
 discord.py
 dateparser.py
 datetime.py
