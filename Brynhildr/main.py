@@ -218,4 +218,4 @@ async def lookupoutput(item: str, message) -> None:
     embed.set_footer(text="Brynhildr Bot is not associated with the GBF Wiki.")
     await message.channel.send(embed=embed)
 
-client.run("NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg")
+bot.run("NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg")
