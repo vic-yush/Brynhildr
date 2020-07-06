@@ -1,5 +1,5 @@
 async-timeout
 discord.py
-dateparser.py
-datetime.py
-pytz.py
+dateparser
+datetime
+pytz
