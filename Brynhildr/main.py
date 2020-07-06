@@ -168,6 +168,7 @@ async def lookupstripped(command: str, message) -> None:
     if item == "Excalibur":
         await message.channel.send("GBF lookup currently does not support "
                                    "lookup of Excalibur")
+        return
     await lookupoutput(item, message)
 
 
@@ -226,6 +227,6 @@ async def lookupoutput(item: str, message) -> None:
         await message.channel.send(embed=embed)
     except:
         await message.channel.send("Something went wrong. Please let the bot"
-                                   "owner know so this can be fixed.")
+                                   " owner know so this can be fixed.")
 
 client.run("NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg")
