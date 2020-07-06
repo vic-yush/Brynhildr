@@ -8,9 +8,9 @@ import requests
 client = discord.Client()
 
 ERRORMESSAGE = "Sorry, I couldn't understand that. Could you try again?"
-MENTIONS = ("Hey Bryn", "Hey Brynhildr", "Hey Brynhild", "Hi Bryn",
-            "Hi Brynhildr", "Hi Brynhild", "Okay Bryn", "Okay Brynhildr",
-            "Okay Brynhild")
+MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
+            "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
+            "okay brynhild")
 
 
 @client.event
