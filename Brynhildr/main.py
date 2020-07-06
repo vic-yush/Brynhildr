@@ -222,6 +222,10 @@ async def lookupoutput(item: str, message) -> None:
     embed.add_field(name="Obtain", value=obtain)
     embed.set_thumbnail(url=image)
     embed.set_footer(text="Brynhildr Bot is not associated with the GBF Wiki.")
-    await message.channel.send(embed=embed)
+    try:
+        await message.channel.send(embed=embed)
+    except:
+        await message.channel.send("Something went wrong. Please let the bot"
+                                   "owner know so this can be fixed.")
 
 client.run("NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg")
