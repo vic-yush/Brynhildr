@@ -1,5 +1,3 @@
-async-timeout
-discord.py
-dateparser
-datetime
-pytz
+discord.py==1.3.3
+dateparser==0.7.6
+pytz==2020.1
