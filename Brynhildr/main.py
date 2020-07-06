@@ -62,14 +62,14 @@ async def reminder(command: str, message) -> None:
         if not endtime:
             await message.channel.send(ERRORMESSAGE)
             return
-        delta = endtime - now
+        delta = pytz.utc.localize(endtime) - now
         action = action[:action.rfind("in ")]
     else:
         endtime = dateparser.parse(action[action.rfind("at "):])
         if not endtime:
             await message.channel.send(ERRORMESSAGE)
             return
-        delta = endtime - now
+        delta = pytz.utc.localize(endtime) - now
         action = action[:action.rfind("at ")]
     await reminderoutput(action, delta, message)
 
