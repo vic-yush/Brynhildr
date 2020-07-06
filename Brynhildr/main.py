@@ -8,6 +8,9 @@ import requests
 client = discord.Client()
 
 ERRORMESSAGE = "Sorry, I couldn't understand that. Could you try again?"
+MENTIONS = ("Hey Bryn", "Hey Brynhildr", "Hey Brynhild", "Hi Bryn",
+            "Hi Brynhildr", "Hi Brynhild", "Okay Bryn", "Okay Brynhildr",
+            "Okay Brynhild")
 
 
 @client.event
@@ -20,7 +23,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.lower().startswith("Hey") or client.user in \
+    if message.content.lower().startswith(MENTIONS) or client.user in \
             message.mentions:
         if "remind me" in message.content.lower():
             await reminder(message.content.lower(), message)
