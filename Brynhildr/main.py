@@ -39,7 +39,7 @@ async def on_message(message):
             await lookupstripped(message.content, message)
         elif "help" in message.content.lower():
             await manual(message)
-        elif "changelog" in message.content.lower:
+        elif "changelog" in message.content.lower():
             await changelog(message)
 
 
