@@ -41,6 +41,12 @@ async def on_message(message):
             await manual(message)
         elif "changelog" in message.content.lower():
             await changelog(message)
+        elif "emotetest" in message.content.lower():
+            await emotetest(message)
+
+
+async def emotetest(message) -> None:
+    await message.channel.send(":despair:")
 
 
 async def changelog(message) -> None:
@@ -218,7 +224,7 @@ async def lookupstripped(command: str, message) -> None:
     Currently not supporting lookup of Excalibur.
     """
     item = command[command.lower().rfind("lookup") + 7:]
-    # TODO: Fix Excalibur
+    # TODO: Fix Excalibur and Moon Weapons
     if item == "Excalibur":
         await message.channel.send("GBF lookup currently does not support "
                                    "lookup of Excalibur")
@@ -247,13 +253,38 @@ async def lookupoutput(item: str, message) -> None:
         await message.channel.send("This is not a weapon page. I can't handle "
                                    "non-weapon pages right now.")
         return
-    description = page.text[page.text.find
-                            ("meta name=\"description\" content=") + 33:]\
-        .split('"', 1)[0]
-    obtainraw = page.text[page.text.find("class=\"obtain-list\"><div>") + 25:]\
-        .split("</div>", 1)[0]
+    embed = discord.Embed()
+    await weaponparse(page.text, embed)
+    embed.title = page.text[page.text.find("wgTitle") + 10:].split('"', 1)[0]
+    embed.url = url
+    embed.set_author(name="GBF Wiki Lookup",
+                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
+    embed.set_footer(text="Brynhildr Bot is not associated with the GBF Wiki.")
+    try:
+        await message.channel.send(embed=embed)
+    except:
+        await message.channel.send("Something went wrong. Please let the bot"
+                                   " owner know so this can be fixed.")
+
+
+async def weaponparse(source: str, embed: discord.Embed) -> None:
+    description = source[source.find("meta name=\"description\" content=") +
+                         33:].split('"', 1)[0]
+    if source.find("class=\"obtain-list-item\">") > 0:
+        # Here's the headache...
+        obtainraw = source[source.find("class=\"obtain-list-item\">") + 25:] \
+                            .split("</div", 1)[0]
+        # Remove tooltip spans
+        if "<span class=\"tooltip\"" in obtainraw:
+            obtainraw[obtainraw.find("<span class=\"tooltip\""):
+                      obtainraw.find("</span>") + 7] = ""
+    else:
+        obtainraw = source[source.find("class=\"obtain-list\"><div>") + 25:] \
+            .split("</div>", 1)[0]
     obtainlinks = [i for i in range(len(obtainraw)) if obtainraw.startswith
                    ("<a href=", i)]
+    # for i in obtainlinks:
+    #     if "<img" in obtainraw[obtainlinks[i] + 9:].split("</a>", 1)[0]:
     obtaintext = [i for i in range(len(obtainraw)) if obtainraw.startswith
                   ("\">", i)]
     index = 0
@@ -269,23 +300,13 @@ async def lookupoutput(item: str, message) -> None:
                    "](https://gbf.wiki" +
                    obtainraw[obtainlinks[i] + 9:].split('"', 1)[0] + ")\n")
         i += 1
-    image = page.text[page.text.find("flex-direction:row;\">") + 21:].split(
+    image = source[source.find("flex-direction:row;\">") + 21:].split(
         "</a>", 1)[0]
     image = "https://gbf.wiki" + \
             image[image.find("/images/thumb"):].split('"', 1)[0]
-    embed = discord.Embed()
-    embed.title = page.text[page.text.find("wgTitle") + 10:].split('"', 1)[0]
-    embed.url = url
-    embed.set_author(name="GBF Wiki Lookup",
-                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
     embed.description = description
-    embed.add_field(name="Obtain", value=obtain)
     embed.set_thumbnail(url=image)
-    embed.set_footer(text="Brynhildr Bot is not associated with the GBF Wiki.")
-    try:
-        await message.channel.send(embed=embed)
-    except:
-        await message.channel.send("Something went wrong. Please let the bot"
-                                   " owner know so this can be fixed.")
+    embed.add_field(name="Obtain", value=obtain)
+
 
 client.run("NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg")
