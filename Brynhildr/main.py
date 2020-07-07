@@ -57,7 +57,7 @@ async def changelog(message) -> None:
                                         "functionality")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " | Made with ♥ by vicyush#4018")
-    message.channel.send(embed=embed)
+    await message.channel.send(embed=embed)
     return
 
 
@@ -79,7 +79,7 @@ async def manual(message) -> None:
                                              "Lookup of pages from the GBF wiki"
                                              ". Currently, only weapon "
                                              "lookup is supported.")
-    message.channel.send(embed=embed)
+    await message.channel.send(embed=embed)
     return
 
 
