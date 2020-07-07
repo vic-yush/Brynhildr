@@ -14,6 +14,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
 VERSION = "v1.01"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
+TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
 
 
 @client.event
@@ -46,7 +47,7 @@ async def on_message(message):
 
 
 async def emotetest(message) -> None:
-    await message.channel.send("\:despair:")
+    await message.channel.send("\:despair:\:zeta:\:thinking:")
 
 
 async def changelog(message) -> None:
@@ -224,11 +225,6 @@ async def lookupstripped(command: str, message) -> None:
     Currently not supporting lookup of Excalibur.
     """
     item = command[command.lower().rfind("lookup") + 7:]
-    # TODO: Fix Excalibur and Moon Weapons
-    if item == "Excalibur":
-        await message.channel.send("GBF lookup currently does not support "
-                                   "lookup of Excalibur")
-        return
     await lookupoutput(item, message)
 
 
@@ -273,11 +269,23 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
     if source.find("class=\"obtain-list-item\">") > 0:
         # Here's the headache...
         obtainraw = source[source.find("class=\"obtain-list-item\">") + 25:] \
-                            .split("</div", 1)[0]
+                            .split("</td", 1)[0]
         # Remove tooltip spans
-        if "<span class=\"tooltip\"" in obtainraw:
+        while "<span class=\"tooltip\"" in obtainraw:
             obtainraw = obtainraw[:obtainraw.find("<span class=\"tooltip\"")] \
                         + obtainraw[obtainraw.find("</span>") + 7:]
+        # Remove image link spans
+        while "<span class=\"image_link\">" in obtainraw:
+            obtainraw = obtainraw[:obtainraw.find("<span class=\"image_link\">"
+                                                  )] + \
+                        obtainraw[obtainraw.find("/>") + 2:]
+        # Remove this div because it breaks parsing
+        while "<div class=\"obtain-list-item\">" in obtainraw:
+            obtainraw = obtainraw[:obtainraw.find
+                                  ("<div class=\"obtain-list-item\">")] + \
+                                  obtainraw[obtainraw.find
+                                            ("<div class=\"obtain-list-item\">")
+                                            + 30:]
     else:
         obtainraw = source[source.find("class=\"obtain-list\"><div>") + 25:] \
             .split("</div>", 1)[0]
@@ -309,4 +317,4 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
     embed.add_field(name="Obtain", value=obtain)
 
 
-client.run("NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg")
+client.run(TOKEN)
