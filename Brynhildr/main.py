@@ -46,7 +46,7 @@ async def on_message(message):
 
 
 async def emotetest(message) -> None:
-    await message.channel.send(":despair:")
+    await message.channel.send("\:despair:")
 
 
 async def changelog(message) -> None:
@@ -276,8 +276,8 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
                             .split("</div", 1)[0]
         # Remove tooltip spans
         if "<span class=\"tooltip\"" in obtainraw:
-            obtainraw[obtainraw.find("<span class=\"tooltip\""):
-                      obtainraw.find("</span>") + 7] = ""
+            obtainraw = obtainraw[:obtainraw.find("<span class=\"tooltip\"")] \
+                        + obtainraw[obtainraw.find("</span>") + 7:]
     else:
         obtainraw = source[source.find("class=\"obtain-list\"><div>") + 25:] \
             .split("</div>", 1)[0]
