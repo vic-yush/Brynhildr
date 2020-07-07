@@ -11,7 +11,7 @@ ERRORMESSAGE = "Sorry, I couldn't understand that. Could you try again?"
 MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
             "okay brynhild")
-VERSION = "v1.01"
+VERSION = "v1.02"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -62,6 +62,8 @@ async def changelog(message) -> None:
                                         "for users attempting to set long "
                                         "reminders\n- Added help command "
                                         "functionality")
+    embed.add_field(name="v1.01", value="- Fixed weapon lookups with edge cases"
+                                        "\n- Minor help page reformatting")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " | Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
@@ -81,11 +83,13 @@ async def manual(message) -> None:
                                            " Warning: the bot is in active "
                                            "development and constant reboots "
                                            "mean that reminders over a longer "
-                                           "time period may be lost.")
+                                           "time period may be lost.",
+                    inline=False)
     embed.add_field(name="GBF Lookup", value="**@Brynhildr lookup [item]** | "
                                              "Lookup of pages from the GBF wiki"
                                              ". Currently, only weapon "
-                                             "lookup is supported.")
+                                             "lookup is supported.",
+                    inline=False)
     await message.channel.send(embed=embed)
     return
 
