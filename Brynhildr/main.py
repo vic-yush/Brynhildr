@@ -52,7 +52,7 @@ async def changelog(message) -> None:
     embed.add_field(name="v1", value="- First operational build!\n- Supports "
                                      "basic GBF wiki lookup for weapons")
     embed.add_field(name="v1.01", value="- Added change log\n- Added warning "
-                                        "for users attempting to set long"
+                                        "for users attempting to set long "
                                         "reminders\n- Added help command "
                                         "functionality")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
