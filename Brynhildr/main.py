@@ -321,4 +321,4 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
     embed.add_field(name="Obtain", value=obtain)
 
 
-client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")
+client.run(TOKEN)
