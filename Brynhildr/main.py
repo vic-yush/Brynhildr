@@ -291,8 +291,8 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
                                             ("<div class=\"obtain-list-item\">")
                                             + 30:]
     else:
-        obtainraw = source[source.find("class=\"obtain-list\"><div>") + 25:] \
-            .split("</div>", 1)[0]
+        obtainraw = source[source.find("class=\"obtain-list\">") + 20:] \
+            .split("</td>", 1)[0]
     obtainlinks = [i for i in range(len(obtainraw)) if obtainraw.startswith
                    ("<a href=", i)]
     # for i in obtainlinks:
@@ -321,4 +321,4 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
     embed.add_field(name="Obtain", value=obtain)
 
 
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")
