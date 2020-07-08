@@ -268,8 +268,10 @@ async def lookupoutput(item: str, message) -> None:
 
 
 async def weaponparse(source: str, embed: discord.Embed) -> None:
+    # Get description, and change apostrophe escape characters to actual
+    # apostrophes
     description = source[source.find("meta name=\"description\" content=") +
-                         33:].split('"', 1)[0]
+                         33:].split('"', 1)[0].replace("&#039;", "'")
     if source.find("class=\"obtain-list-item\">") > 0:
         # Here's the headache...
         obtainraw = source[source.find("class=\"obtain-list-item\">") + 25:] \
@@ -278,10 +280,24 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
         while "<span class=\"tooltip\"" in obtainraw:
             obtainraw = obtainraw[:obtainraw.find("<span class=\"tooltip\"")] \
                         + obtainraw[obtainraw.find("</span>") + 7:]
-        # Remove image link spans
+            obtainraw = obtainraw[:obtainraw.find("</span>")] \
+                        + obtainraw[obtainraw.find("</span>") + 7:]
+        # If both images and image spans are in the remainder, remove the
+        # first occurrence of either until there are no images left
+        while "<span class=\"image_link\">" in obtainraw and \
+              "<img" in obtainraw:
+            if obtainraw.find("<span class=\"image_link\">") < \
+               obtainraw.find("<img"):
+                    obtainraw = obtainraw[:obtainraw.find
+                                          ("<span class=\"image_link\">")] + \
+                                obtainraw[obtainraw.find("/>") + 2:]
+            else:
+                obtainraw = obtainraw[:obtainraw.find("<img")] + \
+                            obtainraw[obtainraw.find("/>") + 2:]
+        # If there are image spans left over, remove them
         while "<span class=\"image_link\">" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find("<span class=\"image_link\">"
-                                                  )] + \
+            obtainraw = obtainraw[:obtainraw.find
+                                  ("<span class=\"image_link\">")] + \
                         obtainraw[obtainraw.find("/>") + 2:]
         # Remove this div because it breaks parsing
         while "<div class=\"obtain-list-item\">" in obtainraw:
@@ -290,13 +306,18 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
                                   obtainraw[obtainraw.find
                                             ("<div class=\"obtain-list-item\">")
                                             + 30:]
+        # Hardcoded case because Arcarum creates an empty line.
+        if "<a href=\"/Arcarum\" title=\"Arcarum\">" in obtainraw:
+            obtainraw = obtainraw[:obtainraw.find
+                                  ("<a href=\"/Arcarum\" title=\"Arcarum\">")] \
+                        + obtainraw[obtainraw.find
+                                    ("<a href=\"/Arcarum\" title=\"Arcarum\">")
+                                    + 35:]
     else:
         obtainraw = source[source.find("class=\"obtain-list\">") + 20:] \
             .split("</td>", 1)[0]
     obtainlinks = [i for i in range(len(obtainraw)) if obtainraw.startswith
                    ("<a href=", i)]
-    # for i in obtainlinks:
-    #     if "<img" in obtainraw[obtainlinks[i] + 9:].split("</a>", 1)[0]:
     obtaintext = [i for i in range(len(obtainraw)) if obtainraw.startswith
                   ("\">", i)]
     index = 0
@@ -321,4 +342,4 @@ async def weaponparse(source: str, embed: discord.Embed) -> None:
     embed.add_field(name="Obtain", value=obtain)
 
 
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")
