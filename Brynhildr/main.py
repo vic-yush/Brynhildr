@@ -64,8 +64,8 @@ async def changelog(message) -> None:
                                         "functionality")
     embed.add_field(name="v1.02", value="- Fixed weapon lookups with edge cases"
                                         "\n- Minor help page reformatting")
-    embed.add_field(name="v1.03", value="- Fixed Luminiera weapon looksups "
-                                        "crashing the bot\n- Apostrophes in"
+    embed.add_field(name="v1.03", value="- Fixed Luminiera weapon lookups "
+                                        "crashing the bot\n- Apostrophes in "
                                         "descriptions display properly now")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " | Made with ♥ by vicyush#4018")
