@@ -11,7 +11,7 @@ ERRORMESSAGE = "Sorry, I couldn't understand that. Could you try again?"
 MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
             "okay brynhild")
-VERSION = "v1.02"
+VERSION = "v1.03"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -62,8 +62,11 @@ async def changelog(message) -> None:
                                         "for users attempting to set long "
                                         "reminders\n- Added help command "
                                         "functionality")
-    embed.add_field(name="v1.01", value="- Fixed weapon lookups with edge cases"
+    embed.add_field(name="v1.02", value="- Fixed weapon lookups with edge cases"
                                         "\n- Minor help page reformatting")
+    embed.add_field(name="v1.03", value="- Fixed Luminiera weapon looksups "
+                                        "crashing the bot\n- Apostrophes in"
+                                        "descriptions display properly now")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " | Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
