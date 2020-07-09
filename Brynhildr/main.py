@@ -4,6 +4,7 @@ import dateparser
 import datetime
 import pytz
 import requests
+from .weapon import weaponparse
 
 client = discord.Client()
 
@@ -12,7 +13,7 @@ ERRORMESSAGE = "<:despair:376080252754984960> Sorry, I couldn't understand th" \
 MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
             "okay brynhild")
-VERSION = "v1.04"
+VERSION = "v1.05"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -43,6 +44,10 @@ async def on_message(message):
             await manual(message)
         elif "changelog" in message.content.lower():
             await changelog(message)
+    elif message.content.lower() == "bad bot":
+        await message.channel.send("Bad human")
+    elif message.content.lower() == "good bot":
+        await message.channel.send("Good human")
 
 
 async def changelog(message) -> None:
@@ -65,6 +70,9 @@ async def changelog(message) -> None:
     embed.add_field(name="v1.04", value="- Added weapon category icons and"
                                         " retrieval timestamps to weapon "
                                         "lookups")
+    embed.add_field(name="v1.05", value="- Replaced element icons with higher-"
+                                        "resolution versions\n- Clarity pass"
+                                        "on help text")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
@@ -79,7 +87,7 @@ async def manual(message) -> None:
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.set_author(name="Help")
-    embed.add_field(name="Reminder", value="**@Brynhildr remindme [action] "
+    embed.add_field(name="Reminder", value="**@Brynhildr remindme \"[action]\" "
                                            "[time]** | Basic reminder function."
                                            " Warning: the bot is in active "
                                            "development and constant reboots "
@@ -239,7 +247,8 @@ async def lookupoutput(item: str, message) -> None:
     page = requests.get(url)
     # Check if the input returns a valid page
     if "There is currently no text in this page." in page.text:
-        await message.channel.send("Could not find this item. Search "
+        await message.channel.send("<:despair:376080252754984960> "
+                                   "Could not find this item. Search "
                                    "functionality will be added soon.")
         return
         # TODO: Add search functionality
@@ -254,69 +263,12 @@ async def lookupoutput(item: str, message) -> None:
                            25:].split("]", 1)[0]
     # Move individual category parsing to a separate method in the future
     if "Weapons" in categories:
-        embed.title = page.text[page.text.find("wgTitle") + 10:].split('"', 1)[
-            0]
-        # Assign rarity icons
-        if "SSR Weapons" in categories:
-            embed.title += " <:Rarity_SSR:730441789667934278>"
-        elif "SR Weapons" in categories:
-            embed.title += " <:Rarity_SR:730441789319807009>"
-        elif "R Weapons" in categories:
-            embed.title += " <:Rarity_R:730441789642768464>"
-        elif "N Weapons" in categories:
-            embed.title += " <:Rarity_N:730441824954482728>"
-        # Assign element icons
-        if "Fire Weapons" in categories:
-            embed.title += " <:Fire:730444188973531276>"
-        elif "Water Weapons" in categories:
-            embed.title += " <:Water:730444188591849536>"
-        elif "Earth Weapons" in categories:
-            embed.title += " <:Earth:730444188646375455>"
-        elif "Wind Weapons" in categories:
-            embed.title += " <:Wind:730444188721610864>"
-        elif "Light Weapons" in categories:
-            embed.title += " <:Light:730444188654633012>"
-        elif "Dark Weapons" in categories:
-            embed.title += " <:Dark:730444188688318465>"
-        # Assign weapon type icon
-        if "Sabre Weapons" in categories:
-            embed.title += " <:Sabre1:730454365248159855>" \
-                           "<:Sabre2:730454663941324861>"
-        elif "Dagger Weapons" in categories:
-            embed.title += " <:Dagger1:730455370233020558>" \
-                           "<:Dagger2:730455370673291314>"
-        elif "Spear Weapons" in categories:
-            embed.title += " <:Spear1:730456104898920458>" \
-                           "<:Spear2:730456104840200363>"
-        elif "Axe Weapons" in categories:
-            embed.title += " <:Axe1:730456397942095943>" \
-                           "<:Axe2:730456397556482110>"
-        elif "Staff Weapons" in categories:
-            embed.title += " <:Staff1:730456836221829173>" \
-                           "<:Staff2:730456836310040677>"
-        elif "Gun Weapons" in categories:
-            embed.title += " <:Gun1:730457164552077382>" \
-                           "<:Gun2:730457164266864784>"
-        elif "Melee Weapons" in categories:
-            embed.title += " <:Melee1:730457549672939621>" \
-                           "<:Melee2:730457549337264139>"
-        elif "Bow Weapons" in categories:
-            embed.title += " <:Bow1:730457814627254322>" \
-                           "<:Bow2:730457814551756840>"
-        elif "Harp Weapons" in categories:
-            embed.title += " <:Harp1:730458095591096420>" \
-                           "<:Harp2:730458095221997580>"
-        elif "Katana Weapons" in categories:
-            embed.title += " <:Katana1:730458503742750822>" \
-                           "<:Katana2:730458504011317319>"
-        elif "Boost Weapons" in categories:
-            embed.title += " <:Boost1:730458765475840091>" \
-                           "<:Boost2:730458765362593812>"
+        await weaponparse(categories, page.text, embed)
     else:
-        await message.channel.send("This is not a weapon page. I can't handle "
+        await message.channel.send("<:despair:376080252754984960> This is not a"
+                                   " weapon page. I can't handle "
                                    "non-weapon pages right now.")
         return
-    await weaponparse(page.text, embed)
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
@@ -330,87 +282,4 @@ async def lookupoutput(item: str, message) -> None:
                                    " owner know so this can be fixed.")
 
 
-async def weaponparse(source: str, embed: discord.Embed) -> None:
-    # Get description, and change apostrophe escape characters to actual
-    # apostrophes
-    description = source[source.find("meta name=\"description\" content=") +
-                         33:].split('"', 1)[0].replace("&#039;", "'")
-    # The table for obtain information is inconsistently coded. This checks
-    # which coding method is being used and cleans the input accordingly.
-    if source.find("class=\"obtain-list-item\">") > 0:
-        # Here's the headache...
-        obtainraw = source[source.find("class=\"obtain-list-item\">") + 25:] \
-                            .split("</td", 1)[0]
-        # Remove tooltip spans
-        while "<span class=\"tooltip\"" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find("<span class=\"tooltip\"")] \
-                        + obtainraw[obtainraw.find("</span>") + 7:]
-            obtainraw = obtainraw[:obtainraw.find("</span>")] \
-                        + obtainraw[obtainraw.find("</span>") + 7:]
-        # If both images and image spans are in the remainder, remove the
-        # first occurrence of either until there are no images left
-        while "<span class=\"image_link\">" in obtainraw and \
-              "<img" in obtainraw:
-            if obtainraw.find("<span class=\"image_link\">") < \
-               obtainraw.find("<img"):
-                    obtainraw = obtainraw[:obtainraw.find
-                                          ("<span class=\"image_link\">")] + \
-                                obtainraw[obtainraw.find("/>") + 2:]
-            else:
-                obtainraw = obtainraw[:obtainraw.find("<img")] + \
-                            obtainraw[obtainraw.find("/>") + 2:]
-        # If there are image spans left over, remove them
-        while "<span class=\"image_link\">" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find
-                                  ("<span class=\"image_link\">")] + \
-                        obtainraw[obtainraw.find("/>") + 2:]
-        # Remove this div because it breaks parsing
-        while "<div class=\"obtain-list-item\">" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find
-                                  ("<div class=\"obtain-list-item\">")] + \
-                                  obtainraw[obtainraw.find
-                                            ("<div class=\"obtain-list-item\">")
-                                            + 30:]
-        # Hardcoded case because Arcarum creates an empty line.
-        if "<a href=\"/Arcarum\" title=\"Arcarum\">" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find
-                                  ("<a href=\"/Arcarum\" title=\"Arcarum\">")] \
-                        + obtainraw[obtainraw.find
-                                    ("<a href=\"/Arcarum\" title=\"Arcarum\">")
-                                    + 35:]
-    # The easy case
-    else:
-        obtainraw = source[source.find("class=\"obtain-list\">") + 20:] \
-            .split("</td>", 1)[0]
-    # Find all links
-    obtainlinks = [i for i in range(len(obtainraw)) if obtainraw.startswith
-                   ("<a href=", i)]
-    # Find all display text corresponding to the links
-    obtaintext = [i for i in range(len(obtainraw)) if obtainraw.startswith
-                  ("\">", i)]
-    index = 0
-    # Remove images
-    while index < len(obtaintext) and obtaintext[index] < len(obtainraw):
-        if obtainraw[obtaintext[index] + 2: obtaintext[index] + 6] == "<img":
-            del obtainlinks[index]
-            del obtaintext[index]
-        index += 1
-    obtain = ""
-    i = 0
-    # Generate output string
-    while i < len(obtainlinks):
-        obtain += ("[" + obtainraw[obtaintext[i] + 2:].split('<', 1)[0] +
-                   "](https://gbf.wiki" +
-                   obtainraw[obtainlinks[i] + 9:].split('"', 1)[0] + ")\n")
-        i += 1
-    # Find weapon image
-    image = source[source.find("flex-direction:row;\">") + 21:].split(
-        "</a>", 1)[0]
-    image = "https://gbf.wiki" + \
-            image[image.find("/images/thumb"):].split('"', 1)[0]
-    embed.description = description
-    embed.set_thumbnail(url=image)
-    embed.add_field(name="Obtain", value=obtain)
-
-
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")
