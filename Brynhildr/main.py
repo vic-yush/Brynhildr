@@ -4,7 +4,7 @@ import dateparser
 import datetime
 import pytz
 import requests
-from .weapon import weaponparse
+from weapon import weaponparse
 
 client = discord.Client()
 
