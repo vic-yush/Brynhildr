@@ -5,6 +5,8 @@ import datetime
 import pytz
 import requests
 from weapon import weaponparse
+from character import characterparse
+from summon import summonparse
 
 client = discord.Client()
 
@@ -13,7 +15,7 @@ ERRORMESSAGE = "<:despair:376080252754984960> Sorry, I couldn't understand th" \
 MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
             "okay brynhild")
-VERSION = "v1.05"
+VERSION = "v1.06"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -73,6 +75,9 @@ async def changelog(message) -> None:
     embed.add_field(name="v1.05", value="- Replaced element icons with higher-"
                                         "resolution versions\n- Clarity pass"
                                         "on help text")
+    embed.add_field(name="v1.06", value="- Added basic character and summon"
+                                        "lookup functionality\n- Moved icons "
+                                        "below titles")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
@@ -260,14 +265,18 @@ async def lookupoutput(item: str, message) -> None:
     embed = discord.Embed()
     # Get page categories
     categories = page.text[page.text.find("wgCategories") +
-                           25:].split("]", 1)[0]
+                           15:].split("]", 1)[0]
     # Move individual category parsing to a separate method in the future
-    if "Weapons" in categories:
+    if "\"Weapons\"" in categories:
         await weaponparse(categories, page.text, embed)
+    elif "\"Characters\"" in categories:
+        await characterparse(categories, page.text, embed)
+    elif "\"Summons\"" in categories:
+        await summonparse(categories, page.text, embed)
     else:
         await message.channel.send("<:despair:376080252754984960> This is not a"
-                                   " weapon page. I can't handle "
-                                   "non-weapon pages right now.")
+                                   " weapon, summon or character page. I can't "
+                                   "handle those pages right now.")
         return
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
@@ -282,4 +291,4 @@ async def lookupoutput(item: str, message) -> None:
                                    " owner know so this can be fixed.")
 
 
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")

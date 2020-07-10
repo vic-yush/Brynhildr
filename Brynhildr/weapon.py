@@ -4,7 +4,8 @@ import discord
 async def weaponparse(categories: str, source: str, embed: discord.Embed) -> \
         None:
     # Generate the title of the embed
-    await generatetitle(categories, source, embed)
+    embed.title = source[source.find("wgTitle") + 10:].split('"', 1)[0]
+    await generateicons(categories, embed)
     # Get description, and change apostrophe escape characters to actual
     # apostrophes
     description = source[source.find("meta name=\"description\" content=") +
@@ -14,74 +15,60 @@ async def weaponparse(categories: str, source: str, embed: discord.Embed) -> \
     # Generate the CA field of the embed
     # CA = await generateca(source)
     # Find weapon image
-    image = source[source.find("flex-direction:row;\">") + 21:].split(
-        "</a>", 1)[0]
-    image = "https://gbf.wiki" + \
-            image[image.find("/images/thumb"):].split('"', 1)[0]
-    embed.description = description
+    image = source[source.find("og:image\" content=\"") + 19:].split('"', 1)[0]
+    embed.description += description
     embed.set_thumbnail(url=image)
     embed.add_field(name="Obtain", value=obtain)
 
 
-async def generatetitle(categories: str, source: str, embed) -> None:
-    # Get title
-    embed.title = source[source.find("wgTitle") + 10:].split('"', 1)[0]
+async def generateicons(categories: str, embed) -> None:
+    text = ""
     # Assign rarity icons
     if "SSR Weapons" in categories:
-        embed.title += " <:Rarity_SSR:730441789667934278>"
+        text += " <:Rarity_SSR:730441789667934278>"
     elif "SR Weapons" in categories:
-        embed.title += " <:Rarity_SR:730441789319807009>"
+        text += " <:Rarity_SR:730441789319807009>"
     elif "R Weapons" in categories:
-        embed.title += " <:Rarity_R:730441789642768464>"
+        text += " <:Rarity_R:730441789642768464>"
     elif "N Weapons" in categories:
-        embed.title += " <:Rarity_N:730441824954482728>"
+        text += " <:Rarity_N:730441824954482728>"
     # Assign element icons
     if "Fire Weapons" in categories:
-        embed.title += " <:Fire:730845600484032624>"
+        text += " <:Fire:730845600484032624>"
     elif "Water Weapons" in categories:
-        embed.title += " <:Water:730845600324780151>"
+        text += " <:Water:730845600324780151>"
     elif "Earth Weapons" in categories:
-        embed.title += " <:Earth:730845600672776202>"
+        text += " <:Earth:730845600672776202>"
     elif "Wind Weapons" in categories:
-        embed.title += " <:Wind:730845600479707157>"
+        text += " <:Wind:730845600479707157>"
     elif "Light Weapons" in categories:
-        embed.title += " <:Light:730845600915914873>"
+        text += " <:Light:730845600915914873>"
     elif "Dark Weapons" in categories:
-        embed.title += " <:Dark:730845600613924954>"
+        text += " <:Dark:730845600613924954>"
     # Assign weapon type icon
     if "Sabre Weapons" in categories:
-        embed.title += " <:Sabre1:730454365248159855>" \
-                       "<:Sabre2:730454663941324861>"
+        text += " <:Sabre1:730454365248159855><:Sabre2:730454663941324861>"
     elif "Dagger Weapons" in categories:
-        embed.title += " <:Dagger1:730455370233020558>" \
-                       "<:Dagger2:730455370673291314>"
+        text += " <:Dagger1:730455370233020558><:Dagger2:730455370673291314>"
     elif "Spear Weapons" in categories:
-        embed.title += " <:Spear1:730456104898920458>" \
-                       "<:Spear2:730456104840200363>"
+        text += " <:Spear1:730456104898920458><:Spear2:730456104840200363>"
     elif "Axe Weapons" in categories:
-        embed.title += " <:Axe1:730456397942095943>" \
-                       "<:Axe2:730456397556482110>"
+        text += " <:Axe1:730456397942095943><:Axe2:730456397556482110>"
     elif "Staff Weapons" in categories:
-        embed.title += " <:Staff1:730456836221829173>" \
-                       "<:Staff2:730456836310040677>"
+        text += " <:Staff1:730456836221829173><:Staff2:730456836310040677>"
     elif "Gun Weapons" in categories:
-        embed.title += " <:Gun1:730457164552077382>" \
-                       "<:Gun2:730457164266864784>"
+        text += " <:Gun1:730457164552077382><:Gun2:730457164266864784>"
     elif "Melee Weapons" in categories:
-        embed.title += " <:Melee1:730457549672939621>" \
-                       "<:Melee2:730457549337264139>"
+        text += " <:Melee1:730457549672939621><:Melee2:730457549337264139>"
     elif "Bow Weapons" in categories:
-        embed.title += " <:Bow1:730457814627254322>" \
-                       "<:Bow2:730457814551756840>"
+        text += " <:Bow1:730457814627254322><:Bow2:730457814551756840>"
     elif "Harp Weapons" in categories:
-        embed.title += " <:Harp1:730458095591096420>" \
-                       "<:Harp2:730458095221997580>"
+        text += " <:Harp1:730458095591096420><:Harp2:730458095221997580>"
     elif "Katana Weapons" in categories:
-        embed.title += " <:Katana1:730458503742750822>" \
-                       "<:Katana2:730458504011317319>"
+        text += " <:Katana1:730458503742750822><:Katana2:730458504011317319>"
     elif "Boost Weapons" in categories:
-        embed.title += " <:Boost1:730458765475840091>" \
-                       "<:Boost2:730458765362593812>"
+        text += " <:Boost1:730458765475840091><:Boost2:730458765362593812>"
+    embed.description = text + "\n"
 
 
 async def generateobtains(source: str) -> str:
