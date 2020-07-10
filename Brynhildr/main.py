@@ -275,8 +275,8 @@ async def lookupoutput(item: str, message) -> None:
         await summonparse(categories, page.text, embed)
     else:
         await message.channel.send("<:despair:376080252754984960> This is not a"
-                                   " weapon, summon or character page. I can't "
-                                   "handle those pages right now.")
+                                   " weapon, summon or playable character page."
+                                   " I can't handle those pages right now.")
         return
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
