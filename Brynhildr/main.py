@@ -291,4 +291,4 @@ async def lookupoutput(item: str, message) -> None:
                                    " owner know so this can be fixed.")
 
 
-client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")
+client.run(TOKEN)
