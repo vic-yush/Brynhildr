@@ -8,9 +8,11 @@ async def characterparse(categories: str, source: str, embed: discord.Embed) \
     await generateicons(categories, embed)
     description = source[source.find("meta name=\"description\" content=") +
                          33:].split('"', 1)[0].replace("&#039;", "'")
+    obtain = generateobtain(source)
     image = source[source.find("og:image\" content=\"") + 19:].split('"', 1)[0]
     embed.description += description
     embed.set_thumbnail(url=image)
+    embed.add_field(name="How to Recruit", value=obtain)
 
 
 async def generateicons(categories: str, embed: discord.Embed) \
@@ -83,3 +85,10 @@ async def generateicons(categories: str, embed: discord.Embed) \
     if "Katana Characters" in categories:
         text += " <:Katana1:730458503742750822><:Katana2:730458504011317319>"
     embed.description = text + "\n"
+
+
+def generateobtain(source: str) -> str:
+    raw = source[source.find("How to Recruit") + 14:].split("</tbody>", 1)[0]
+    link = raw[raw.find("<a href=\"") + 9:].split('"', 1)[0]
+    text = raw[raw.find("title=\"") + 7:].split('"', 1)[0]
+    return "[" + text + "](https://gbf.wiki" + link + ")"

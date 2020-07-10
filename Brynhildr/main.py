@@ -75,7 +75,7 @@ async def changelog(message) -> None:
     embed.add_field(name="v1.05", value="- Replaced element icons with higher-"
                                         "resolution versions\n- Clarity pass"
                                         "on help text")
-    embed.add_field(name="v1.06", value="- Added basic character and summon"
+    embed.add_field(name="v1.06", value="- Added character and summon "
                                         "lookup functionality\n- Moved icons "
                                         "below titles")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
@@ -281,7 +281,7 @@ async def lookupoutput(item: str, message) -> None:
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
-    embed.set_footer(text="Brynhildr Bot is not associated with the GBF Wiki."
+    embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki."
                           " • Brynhildr " + VERSION)
     embed.timestamp = datetime.datetime.utcnow()
     try:
@@ -291,4 +291,4 @@ async def lookupoutput(item: str, message) -> None:
                                    " owner know so this can be fixed.")
 
 
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")

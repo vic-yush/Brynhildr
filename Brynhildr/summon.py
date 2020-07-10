@@ -8,9 +8,11 @@ async def summonparse(categories: str, source: str, embed: discord.Embed) \
     await generateicons(categories, embed)
     description = source[source.find("meta name=\"description\" content=") +
                          33:].split('"', 1)[0].replace("&#039;", "'")
+    obtain = generateobtain(source)
     image = source[source.find("og:image\" content=\"") + 19:].split('"', 1)[0]
     embed.description += description
     embed.set_thumbnail(url=image)
+    embed.add_field(name="Obtain", value=obtain)
 
 
 async def generateicons(categories: str, embed: discord.Embed) \
@@ -39,3 +41,21 @@ async def generateicons(categories: str, embed: discord.Embed) \
     elif "Dark Summons" in categories:
         text += " <:Dark:730845600613924954>"
     embed.description = text + "\n"
+
+
+def generateobtain(source: str) -> str:
+    raw = source[source.find("Obtain") + 6:].split("</tr>", 1)[0]
+    # Find all links
+    obtainlinks = [i for i in range(len(raw)) if raw.startswith
+                   ("<a href=", i)]
+    # Find all display text corresponding to the links
+    obtaintext = [i for i in range(len(raw)) if raw.startswith
+                  ("title=\"", i)]
+    obtain = ""
+    i = 0
+    while i < len(obtainlinks):
+        obtain += ("[" + raw[obtaintext[i] + 7:].split('"', 1)[0] +
+                   "](https://gbf.wiki" +
+                   raw[obtainlinks[i] + 9:].split('"', 1)[0] + ")\n")
+        i += 1
+    return obtain
