@@ -42,10 +42,8 @@ async def on_message(message):
             await reminder(message.content.lower(), message)
         elif "remindme" in message.content.lower():
             await reminderstripped(message.content.lower(), message)
-        elif any(ele in message.content.lower for ele in GBF):
-            await lookup(message.content, message, "GBF")
-        elif any(ele in message.content.lower for ele in LEAGUE):
-            await lookup(message.content, message, "LOL")
+        elif "lookup" in message.content.lower():
+            await lookup(message.content, message)
         elif "help" in message.content.lower():
             await manual(message)
         elif "changelog" in message.content.lower():
@@ -54,6 +52,8 @@ async def on_message(message):
         await message.channel.send("Bad human")
     elif message.content.lower() == "good bot":
         await message.channel.send("Good human")
+    elif "zeta" in message.content.lower():
+        await zeta(message)
 
 
 async def changelog(message) -> None:
@@ -283,7 +283,7 @@ async def reminderoutput(action: str, delta: datetime.timedelta, message) -> \
     if delta.days > 0 or delta.seconds // 3600 > 1:
         await message.channel.send("Please be careful when asking for reminders"
                                    " over extended periods of time. The bot is "
-                                   "in constant development and will reboot"
+                                   "in constant development and will reboot "
                                    "to implement new changes, losing any "
                                    "reminders that have been set.")
     await asyncio.sleep(delta.seconds + (delta.days * 86400))
@@ -292,7 +292,7 @@ async def reminderoutput(action: str, delta: datetime.timedelta, message) -> \
                                "as you requested.")
 
 
-async def lookup(command: str, message, cat: str) -> None:
+async def lookup(command: str, message) -> None:
     """
     Processes command-style input for the lookup function.
     Format: Hey bot/[mention] lookup [item]
@@ -301,8 +301,7 @@ async def lookup(command: str, message, cat: str) -> None:
         item = command[command.lower().rfind("lookup") + 10:]
     else:
         item = command[command.lower().rfind("look up") + 11:]
-    if cat == "GBF":
-        await lookupgbf(item, message)
+    await lookupgbf(item, message)
 
 
 async def lookupgbf(item: str, message) -> None:
