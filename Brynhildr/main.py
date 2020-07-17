@@ -297,10 +297,7 @@ async def lookup(command: str, message) -> None:
     Processes command-style input for the lookup function.
     Format: Hey bot/[mention] lookup [item]
     """
-    if "lookup" in command.lower():
-        item = command[command.lower().rfind("lookup") + 10:]
-    else:
-        item = command[command.lower().rfind("look up") + 11:]
+    item = command[command.lower().rfind("lookup") + 7:]
     await lookupgbf(item, message)
 
 
