@@ -52,7 +52,7 @@ async def on_message(message):
         await message.channel.send("Bad human")
     elif message.content.lower() == "good bot":
         await message.channel.send("Good human")
-    elif message.content.lower() == "zeta":
+    elif "zeta" in message.content.lower():
         await zeta(message)
 
 
