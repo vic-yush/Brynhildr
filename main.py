@@ -301,7 +301,7 @@ async def lookup(command: str, message) -> None:
         item = command[command.lower().rfind("lookup") + 10:]
     else:
         item = command[command.lower().rfind("look up") + 11:]
-    lookupgbf(item, message)
+    await lookupgbf(item, message)
 
 
 async def lookupgbf(item: str, message) -> None:
