@@ -15,6 +15,8 @@ ERRORMESSAGE = "<:despair:376080252754984960> Sorry, I couldn't understand th" \
 MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
             "okay brynhild")
+GBF = ["lookup gbf", "look up gbf"]
+LEAGUE = ["lookup lol", "look up lol"]
 VERSION = "v1.06"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
@@ -40,8 +42,10 @@ async def on_message(message):
             await reminder(message.content.lower(), message)
         elif "remindme" in message.content.lower():
             await reminderstripped(message.content.lower(), message)
-        elif "lookup" in message.content.lower():
-            await lookupstripped(message.content, message)
+        elif any(ele in message.content.lower for ele in GBF):
+            await lookup(message.content, message, "GBF")
+        elif any(ele in message.content.lower for ele in LEAGUE):
+            await lookup(message.content, message, "LOL")
         elif "help" in message.content.lower():
             await manual(message)
         elif "changelog" in message.content.lower():
@@ -106,6 +110,58 @@ async def manual(message) -> None:
                     inline=False)
     await message.channel.send(embed=embed)
     return
+
+
+async def zeta(message) -> None:
+    message.channel.send("<:zeta_0_0:733749922645409803>"
+                         "<:zeta_1_0:733749923031416852>"
+                         "<:zeta_2_0:733749923421618206>"
+                         "<:zeta_3_0:733749923627139213>"
+                         "<:zeta_4_0:733749924436508683>"
+                         "<:zeta_5_0:733749924465868802>"
+                         "<:zeta_6_0:733749924633641042>\n"
+                         "<:zeta_0_1:733749922653798491>"
+                         "<:zeta_1_1:733749922771238965>"
+                         "<:zeta_2_1:733749923123822694>"
+                         "<:zeta_3_1:733749923647848458>"
+                         "<:zeta_4_1:733749924436639834>"
+                         "<:zeta_5_1:733749924478451753>"
+                         "<:zeta_6_1:733749924662870086>\n"
+                         "<:zeta_0_2:733749922691678218>"
+                         "<:zeta_1_2:733749923081617458>"
+                         "<:zeta_2_2:733749923085942805>"
+                         "<:zeta_3_2:733749923710763059>"
+                         "<:zeta_4_2:733749924088250440>"
+                         "<:zeta_5_2:733749924197564467>"
+                         "<:zeta_6_2:733749924654612570>\n"
+                         "<:zeta_0_3:733749922775695441>"
+                         "<:zeta_1_3:733749923169959976>"
+                         "<:zeta_2_3:733749923274686555>"
+                         "<:zeta_3_3:733749923362898002>"
+                         "<:zeta_4_3:733749924545560716>"
+                         "<:zeta_5_3:733749924461674626>"
+                         "<:zeta_6_3:733749924394434581>\n"
+                         "<:zeta_0_4:733749922763112499>"
+                         "<:zeta_1_4:733749923165503578>"
+                         "<:zeta_2_4:733749923283075177>"
+                         "<:zeta_3_4:733749923937386566>"
+                         "<:zeta_4_4:733749924537171999>"
+                         "<:zeta_5_4:733749924142776472>"
+                         "<:zeta_6_4:733749924688167053>\n"
+                         "<:zeta_0_5:733749922637021267>"
+                         "<:zeta_1_5:733749922880290899>"
+                         "<:zeta_2_5:733749923446652939>"
+                         "<:zeta_3_5:733749924415668285>"
+                         "<:zeta_4_5:733749924038180935>"
+                         "<:zeta_5_5:733749924373725187>"
+                         "<:zeta_6_5:733749924788961361>\n"
+                         "<:zeta_0_6:733749922909913128>"
+                         "<:zeta_1_6:733749923232874566>"
+                         "<:zeta_2_6:733749923656368249>"
+                         "<:zeta_3_6:733749924507943013>"
+                         "<:zeta_4_6:733749924528914552>"
+                         "<:zeta_5_6:733749924533108746>"
+                         "<:zeta_6_6:733749924738367498>")
 
 
 async def reminder(command: str, message) -> None:
@@ -236,17 +292,20 @@ async def reminderoutput(action: str, delta: datetime.timedelta, message) -> \
                                "as you requested.")
 
 
-async def lookupstripped(command: str, message) -> None:
+async def lookup(command: str, message, cat: str) -> None:
     """
     Processes command-style input for the lookup function.
     Format: Hey bot/[mention] lookup [item]
-    Currently not supporting lookup of Excalibur.
     """
-    item = command[command.lower().rfind("lookup") + 7:]
-    await lookupoutput(item, message)
+    if "lookup" in command.lower():
+        item = command[command.lower().rfind("lookup") + 10:]
+    else:
+        item = command[command.lower().rfind("look up") + 11:]
+    if cat == "GBF":
+        await lookupgbf(item, message)
 
 
-async def lookupoutput(item: str, message) -> None:
+async def lookupgbf(item: str, message) -> None:
     # Get a page with the given input
     url = "https://gbf.wiki/" + item.replace(" ", "_")
     page = requests.get(url)
@@ -266,7 +325,6 @@ async def lookupoutput(item: str, message) -> None:
     # Get page categories
     categories = page.text[page.text.find("wgCategories") +
                            15:].split("]", 1)[0]
-    # Move individual category parsing to a separate method in the future
     if "\"Weapons\"" in categories:
         await weaponparse(categories, page.text, embed)
     elif "\"Characters\"" in categories:
@@ -289,6 +347,10 @@ async def lookupoutput(item: str, message) -> None:
     except:
         await message.channel.send("Something went wrong. Please let the bot"
                                    " owner know so this can be fixed.")
+
+
+async def lookuplol() -> None:
+    return
 
 
 client.run(TOKEN)
