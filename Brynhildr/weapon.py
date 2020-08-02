@@ -1,4 +1,5 @@
 import discord
+from bs4 import BeautifulSoup
 
 
 async def weaponparse(categories: str, source: str, embed: discord.Embed) -> \
@@ -74,71 +75,28 @@ async def generateicons(categories: str, embed) -> None:
 async def generateobtains(source: str) -> str:
     # The table for obtain information is inconsistently coded. This checks
     # which coding method is being used and cleans the input accordingly.
-    if source.find("class=\"obtain-list-item\">") > 0:
-        # Here's the headache...
-        obtainraw = source[source.find("class=\"obtain-list-item\">") + 25:] \
-            .split("</td", 1)[0]
-        # Remove tooltip spans
-        while "<span class=\"tooltip\"" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find("<span class=\"tooltip\"")] \
-                        + obtainraw[obtainraw.find("</span>") + 7:]
-            obtainraw = obtainraw[:obtainraw.find("</span>")] \
-                        + obtainraw[obtainraw.find("</span>") + 7:]
-        # If both images and image spans are in the remainder, remove the
-        # first occurrence of either until there are no images left
-        while "<span class=\"image_link\">" in obtainraw and \
-                "<img" in obtainraw:
-            if obtainraw.find("<span class=\"image_link\">") < \
-                    obtainraw.find("<img"):
-                obtainraw = obtainraw[:obtainraw.find
-                                      ("<span class=\"image_link\">")] + \
-                            obtainraw[obtainraw.find("/>") + 2:]
-            else:
-                obtainraw = obtainraw[:obtainraw.find("<img")] + \
-                            obtainraw[obtainraw.find("/>") + 2:]
-        # If there are image spans left over, remove them
-        while "<span class=\"image_link\">" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find
-                                  ("<span class=\"image_link\">")] + \
-                        obtainraw[obtainraw.find("/>") + 2:]
-        # Remove this div because it breaks parsing
-        while "<div class=\"obtain-list-item\">" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find
-                                  ("<div class=\"obtain-list-item\">")] + \
-                        obtainraw[obtainraw.find
-                                  ("<div class=\"obtain-list-item\">")
-                                  + 30:]
-        # Hardcoded case because Arcarum creates an empty line.
-        if "<a href=\"/Arcarum\" title=\"Arcarum\">" in obtainraw:
-            obtainraw = obtainraw[:obtainraw.find
-                                  ("<a href=\"/Arcarum\" title=\"Arcarum\">")] \
-                        + obtainraw[obtainraw.find
-                                    ("<a href=\"/Arcarum\" title=\"Arcarum\">")
-                                    + 35:]
-    # The easy case
-    else:
-        obtainraw = source[source.find("class=\"obtain-list\">") + 20:] \
-            .split("</td>", 1)[0]
-    # Find all links
-    obtainlinks = [i for i in range(len(obtainraw)) if obtainraw.startswith
-                   ("<a href=", i)]
-    # Find all display text corresponding to the links
-    obtaintext = [i for i in range(len(obtainraw)) if obtainraw.startswith
-                  ("\">", i)]
-    index = 0
-    # Remove images
-    while index < len(obtaintext) and obtaintext[index] < len(obtainraw):
-        if obtainraw[obtaintext[index] + 2: obtaintext[index] + 6] == "<img":
-            del obtainlinks[index]
-            del obtaintext[index]
-        index += 1
+    parsed = BeautifulSoup(source, 'html.parser')
+    obtainlinks = []
+    obtaintext = []
     obtain = ""
-    i = 0
+    if "class=\"obtain-list-item\">" in source:
+        # Thank you BS4 very cool
+        obtainraw = parsed.find_all("div", {"class": "obtain-list-item"})
+        for entry in obtainraw:
+            links = entry.find_all("a")
+            obtainlinks.append(links[len(links) - 1]['href'])
+            obtaintext.append(links[len(links) - 1].text)
+    else:
+        obtainraw = parsed.find_all("td", {"class": "obtain-list"})
+        links = obtainraw[0].find_all("a")
+        for entry in links:
+            obtainlinks.append(entry['href'])
+            obtaintext.append(entry.text)
     # Generate output string
+    i = 0
     while i < len(obtainlinks):
-        obtain += ("[" + obtainraw[obtaintext[i] + 2:].split('<', 1)[0] +
-                   "](https://gbf.wiki" +
-                   obtainraw[obtainlinks[i] + 9:].split('"', 1)[0] + ")\n")
+        obtain += ("[" + obtaintext[i] + "](https://gbf.wiki" +
+                   obtainlinks[i] + ")\n")
         i += 1
     return obtain
 

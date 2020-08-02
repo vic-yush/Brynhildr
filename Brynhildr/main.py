@@ -17,7 +17,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.06"
+VERSION = "v1.07"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -62,8 +62,6 @@ async def changelog(message) -> None:
     """
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1", value="- First operational build!\n- Supports "
-                                     "basic GBF wiki lookup for weapons")
     embed.add_field(name="v1.01", value="- Added change log\n- Added warning "
                                         "for users attempting to set long "
                                         "reminders\n- Added help command "
@@ -82,6 +80,10 @@ async def changelog(message) -> None:
     embed.add_field(name="v1.06", value="- Added character and summon "
                                         "lookup functionality\n- Moved icons "
                                         "below titles")
+    embed.add_field(name="v1.07", value="- Migrated HTML parsing to "
+                                        "BeautifulSoup4. This has no effect on"
+                                        " what you see, but it saves vic a lot"
+                                        " of sanity.")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
@@ -346,6 +348,7 @@ async def lookupgbf(item: str, message) -> None:
 
 
 async def lookuplol() -> None:
+    # I'm working on it, I swear.
     return
 
 
