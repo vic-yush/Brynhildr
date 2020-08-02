@@ -83,7 +83,10 @@ async def changelog(message) -> None:
     embed.add_field(name="v1.07", value="- Migrated HTML parsing to "
                                         "BeautifulSoup4. This has no effect on"
                                         " what you see, but it saves vic a lot"
-                                        " of sanity.")
+                                        " of sanity.\n- Weapon lookup now has "
+                                        "basic Charge Attack information. "
+                                        "Please let vic know if something is "
+                                        "missing an icon!")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)

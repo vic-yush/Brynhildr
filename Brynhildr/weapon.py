@@ -14,12 +14,14 @@ async def weaponparse(categories: str, source: str, embed: discord.Embed) -> \
     # Generate the obtain field of the embed
     obtain = await generateobtains(source)
     # Generate the CA field of the embed
-    # CA = await generateca(source)
+    chargeattack = await generateca(source)
     # Find weapon image
     image = source[source.find("og:image\" content=\"") + 19:].split('"', 1)[0]
     embed.description += description
     embed.set_thumbnail(url=image)
-    embed.add_field(name="Obtain", value=obtain)
+    embed.add_field(name="Obtain", value=obtain, inline=True)
+    embed.add_field(name="Charge Attack: " + chargeattack[0],
+                    value=chargeattack[1], inline=True)
 
 
 async def generateicons(categories: str, embed) -> None:
@@ -101,51 +103,32 @@ async def generateobtains(source: str) -> str:
     return obtain
 
 
-async def generateca(source) -> str:
+async def generateca(source) -> list:
     # Cutting out unneeded bits
-    raw = source[source.find("<img alt=\"Skill") + 15:] \
+    raw = source[source.find("<img alt=\"Skill"):] \
         .split("</tr>", 1)[0]
-    raw = raw[raw.find("<td class=\"skill-name\">") + 23:]
     # ...Mirage Munitions
     if "None" in raw:
-        return "None"
+        return ["None", "None"]
+    parsed = BeautifulSoup(raw, 'html.parser')
     # Getting the name
-    name = raw.split("</td>", 1)[0]
-    # More cutting
-    raw = raw[raw.find("<td>") + 4:]
-    # Remove citations
-    while "<sup" in raw:
-        raw = raw[raw.find("<sup"):] + raw[:raw.find("</sup>") + 6]
+    name = parsed.find_all("td", {"class": "skill-name"})[0].text
     # Remove line breaks
-    while "<br />" in raw:
-        raw = raw[raw.find("<br />"):] + " " + raw[:raw.find("<br />") + 6]
+    for br in parsed.find_all("br"):
+        br.replace_with("\n")
+    # Remove tooltips
+    for br in parsed.find_all("span", {"class": "tooltiptext"}):
+        br.replace_with("")
+    # Remove citations
+    for sup in parsed.find_all("sup"):
+        sup.replace_with("")
     # Check for charge bar effects
-    while "<a href=\"/Status_Effects#Charge_Bar" in raw:
-        if ">Charge Bar" not in raw[raw.find
-                                    ("<a href=\"/Status_Effects#Charge_Bar"):] \
-                .split("</a>", 1)[0]:
-            # Image, replace with emote
-            raw = raw[raw.find("<a href=\"/Status_Effects#Charge_Bar"):] + \
-                            "<:ChargeBar:730532683364434092> " + \
-                            raw[:raw.find("</a>") + 4]
-        else:
-            # Text, remove wrapper
-            raw = raw[raw.find("<a href=\"/Status_Effects#Charge_Bar"):] + \
-                  raw[:raw[raw.find("<a href=\"/Status_Effects#Charge_Bar"):].
-                      find(">")]
-    # Check for Revitalize effects
-    while "<a href=\"/Revitalize" in raw:
-        if ">Revitalize" not in raw[raw.find
-                                    ("<a href=\"/Revitalize"):] \
-                .split("</a>", 1)[0]:
-            # Image, replace with emote
-            raw = raw[raw.find("<a href=\"/Revitalize"):] + \
-                            "<:ChargeBar:730532683364434092> " + \
-                            raw[:raw.find("</a>") + 4]
-        else:
-            # Text, remove wrapper
-            raw = raw[raw.find("<a href=\"/Revitalize"):] + \
-                  raw[:raw[raw.find("<a href=\"/Revitalize"):].
-                      find(">")]
-    output = ""
-    return output
+    for img in parsed.find_all("img", {"alt": "Status Uplift.png"}):
+        img.replace_with("<:ChargeBar:730532683364434092>")
+    for img in parsed.find_all("img", {"alt": "Status Revitalize.png"}):
+        img.replace_with("<:Revitalize:739609067185504318>")
+    for span in parsed.find_all("span", {"class": "skill-upgrade-text"}):
+        span.string.replace_with("**" + span.string + "**")
+    # Basic text output. Upgrade later!
+    output = parsed.find_all("td", {"class": ""})[0].text
+    return [name, output]
