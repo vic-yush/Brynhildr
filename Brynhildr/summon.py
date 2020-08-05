@@ -163,12 +163,16 @@ async def generatecall(source: str) -> list:
             uncap += "/" + tr.find("th").text
             skillspan -= 1
         else:
-            uncap = tr.find("th").text
+            if "once" not in tr.text:
+                uncap = tr.find("th").text
         # If all the uncaps are covered (skillspan <=1), then the output is
         # processed and stored, and the buffer variables and counters are reset.
         if skillspan <= 1:
             skillspan = 0
-            outputtext += "**" + uncap + ":** " + call + " (" + cd + ")\n"
+            if "once" not in tr.text:
+                outputtext += "**" + uncap + ":** " + call + " (" + cd + ")\n"
+            else:
+                outputtext += "**" + call + "**\n"
             uncap = ""
             if cdspan <= 1:
                 cd = ""
