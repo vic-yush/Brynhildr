@@ -31,4 +31,4 @@ v1.1
 - Characters now have their charge attacks, skills, and subskills listed
 - Summons now have their auras and calls listed
 - Simple lookup is now available with the "lookupsimple" command, since the normal lookup command is getting rather big
-- Lazy lookup is now available by surrounding your search query with <>, or s<> if you'd like simple lookup.
+- Lazy lookup is now available by surrounding your search query with [], or s[] if you'd like simple lookup.
