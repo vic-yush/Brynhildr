@@ -1,0 +1,34 @@
+v1.0:
+- First operational build!
+- Supports basic GBF wiki lookup for weapons
+v1.01:
+- Added change log
+- Added warning for users attempting to set long reminders
+- Added help command functionality
+v1.02:
+- Fixed weapon lookups with edge cases
+- Minor help page reformatting
+v1.03
+- Fixed Luminiera weapon lookups crashing the bot
+- Apostrophes in descriptions display properly now
+v1.04
+- Added weapon category icons and retrieval timestamps to weapon lookups
+v1.05
+- Replaced element icons with higher-resolution versions
+- Clarity pass on help text
+v1.06
+- Added character and summon lookup functionality
+- Moved icons below titles
+v1.07
+- Migrated advanced HTML parsing to BeautifulSoup4. This has no effect on what you see, but it saves vic a lot of sanity.
+- Weapon lookup now has basic Charge Attack information. Please let vic know if something is missing an icon!
+v1.1
+- HUGE update!
+- Finalized migrating advanced HTML parsing to BS4
+- Added 4/5★ uncap stars
+- Characters obtainable via Premium Draw now have their recruitment weapon listed
+- Weapons now have their skills and charge attacks included in lookup
+- Characters now have their charge attacks, skills, and subskills listed
+- Summons now have their auras and calls listed
+- Simple lookup is now available with the "lookupsimple" command, since the normal lookup command is getting rather big
+- Lazy lookup is now available by surrounding your search query with <>, or s<> if you'd like simple lookup.
