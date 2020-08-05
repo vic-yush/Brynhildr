@@ -3,6 +3,7 @@ import discord
 import dateparser
 import datetime
 import pytz
+import re
 import requests
 from weapon import weaponparse
 from character import characterparse
@@ -17,7 +18,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.07"
+VERSION = "v1.1b"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -35,15 +36,22 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-
-    if message.content.lower().startswith(MENTIONS) or client.user in \
+    if re.search("s<(.*)>", message.content):
+        await lookup(re.search("s<(.*)>", message.content).group(1), message,
+                     True, True)
+    elif re.search("<(.*)>", message.content):
+        await lookup(re.search("<(.*)>", message.content).group(1), message,
+                     False, True)
+    elif message.content.lower().startswith(MENTIONS) or client.user in \
             message.mentions:
         if "remind me" in message.content.lower():
             await reminder(message.content.lower(), message)
         elif "remindme" in message.content.lower():
             await reminderstripped(message.content.lower(), message)
+        elif "lookupsimple" in message.content.lower():
+            await lookup(message.content, message, True, False)
         elif "lookup" in message.content.lower():
-            await lookup(message.content, message)
+            await lookup(message.content, message, False, False)
         elif "help" in message.content.lower():
             await manual(message)
         elif "changelog" in message.content.lower():
@@ -62,10 +70,6 @@ async def changelog(message) -> None:
     """
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.01", value="- Added change log\n- Added warning "
-                                        "for users attempting to set long "
-                                        "reminders\n- Added help command "
-                                        "functionality")
     embed.add_field(name="v1.02", value="- Fixed weapon lookups with edge cases"
                                         "\n- Minor help page reformatting")
     embed.add_field(name="v1.03", value="- Fixed Luminiera weapon lookups "
@@ -75,18 +79,35 @@ async def changelog(message) -> None:
                                         " retrieval timestamps to weapon "
                                         "lookups")
     embed.add_field(name="v1.05", value="- Replaced element icons with higher-"
-                                        "resolution versions\n- Clarity pass"
+                                        "resolution versions\n- Clarity pass "
                                         "on help text")
     embed.add_field(name="v1.06", value="- Added character and summon "
                                         "lookup functionality\n- Moved icons "
                                         "below titles")
-    embed.add_field(name="v1.07", value="- Migrated HTML parsing to "
+    embed.add_field(name="v1.07", value="- Migrated advanced HTML parsing to "
                                         "BeautifulSoup4. This has no effect on"
                                         " what you see, but it saves vic a lot"
                                         " of sanity.\n- Weapon lookup now has "
                                         "basic Charge Attack information. "
                                         "Please let vic know if something is "
                                         "missing an icon!")
+    embed.add_field(name="v1.1", value="- HUGE update!\n- Finalized migrating "
+                                       "advanced HTML parsing to BS4\n- Added "
+                                       "4/5★ uncap stars\n- Characters "
+                                       "obtainable via Premium Draw now have "
+                                       "their recruitment weapon listed\n- "
+                                       "Weapons now have their skills and "
+                                       "charge attacks included in lookup\n- "
+                                       "Characters now have their charge "
+                                       "attacks, skills, and subskills listed\n"
+                                       "- Summons now have their auras and "
+                                       "calls listed\n- Simple lookup is now "
+                                       "available with the \"lookupsimple\" "
+                                       "command, since the normal lookup "
+                                       "command is getting rather big\n - Lazy "
+                                       "lookup is now available by surrounding "
+                                       "your search query with <>, or s<> if "
+                                       "you'd like simple lookup")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
@@ -110,9 +131,25 @@ async def manual(message) -> None:
                     inline=False)
     embed.add_field(name="GBF Lookup", value="**@Brynhildr lookup [item]** | "
                                              "Lookup of pages from the GBF wiki"
-                                             ". Currently, only weapon "
-                                             "lookup is supported.",
+                                             ". Currently, only weapon, summon "
+                                             "and playable character lookup is "
+                                             "supported.",
                     inline=False)
+    embed.add_field(name="Simple GBF Lookup", value="**@Brynhildr lookupsimple"
+                                                    " [item]** | "
+                                                    "Lookup of pages from the "
+                                                    "GBF wiki, with less "
+                                                    "information and in a "
+                                                    "smaller embed. Currently, "
+                                                    "only weapon, summon and "
+                                                    " playable character lookup"
+                                                    " is supported.",
+                    inline=False)
+    embed.add_field(name="Lazy GBF Lookup", value="**<[item]> anywhere in your "
+                                                  "message; s<[item]> for "
+                                                  "simple lookup | Functionally"
+                                                  " identical to normal lookup,"
+                                                  " but less effort to call.")
     await message.channel.send(embed=embed)
     return
 
@@ -297,16 +334,22 @@ async def reminderoutput(action: str, delta: datetime.timedelta, message) -> \
                                "as you requested.")
 
 
-async def lookup(command: str, message) -> None:
+async def lookup(command: str, message, simple: bool, quick: bool) -> None:
     """
     Processes command-style input for the lookup function.
     Format: Hey bot/[mention] lookup [item]
     """
-    item = command[command.lower().rfind("lookup") + 7:]
-    await lookupgbf(item, message)
+    if not quick:
+        if simple:
+            item = command[command.lower().rfind("lookupsimple") + 13:]
+        else:
+            item = command[command.lower().rfind("lookup") + 7:]
+        await lookupgbf(item, message, simple)
+    else:
+        await lookupgbf(command, message, simple)
 
 
-async def lookupgbf(item: str, message) -> None:
+async def lookupgbf(item: str, message, simple: bool) -> None:
     # Get a page with the given input
     url = "https://gbf.wiki/" + item.replace(" ", "_")
     page = requests.get(url)
@@ -327,11 +370,11 @@ async def lookupgbf(item: str, message) -> None:
     categories = page.text[page.text.find("wgCategories") +
                            15:].split("]", 1)[0]
     if "\"Weapons\"" in categories:
-        await weaponparse(categories, page.text, embed)
+        await weaponparse(categories, page.text, embed, simple)
     elif "\"Characters\"" in categories:
-        await characterparse(categories, page.text, embed)
+        await characterparse(categories, page.text, embed, simple)
     elif "\"Summons\"" in categories:
-        await summonparse(categories, page.text, embed)
+        await summonparse(categories, page.text, embed, simple)
     else:
         await message.channel.send("<:despair:376080252754984960> This is not a"
                                    " weapon, summon or playable character page."
@@ -343,11 +386,11 @@ async def lookupgbf(item: str, message) -> None:
     embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki."
                           " • Brynhildr " + VERSION)
     embed.timestamp = datetime.datetime.utcnow()
-    try:
-        await message.channel.send(embed=embed)
-    except:
-        await message.channel.send("Something went wrong. Please let the bot"
-                                   " owner know so this can be fixed.")
+    # try:
+    await message.channel.send(embed=embed)
+    # except:
+    #     await message.channel.send("Something went wrong. Please let the bot"
+    #                                " owner know so this can be fixed.")
 
 
 async def lookuplol() -> None:
@@ -355,4 +398,4 @@ async def lookuplol() -> None:
     return
 
 
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")

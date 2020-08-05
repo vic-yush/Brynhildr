@@ -1,27 +1,37 @@
 import discord
-from bs4 import BeautifulSoup
+from icons import iconreplace
+from util import *
 
 
-async def weaponparse(categories: str, source: str, embed: discord.Embed) -> \
-        None:
+async def weaponparse(categories: str, source: str, embed: discord.Embed,
+                      simple: bool) -> None:
+    parsed = BeautifulSoup(source, 'html.parser')
     # Generate the title of the embed
     embed.title = source[source.find("wgTitle") + 10:].split('"', 1)[0]
+    # Generate icon line
     await generateicons(categories, embed)
     # Get description, and change apostrophe escape characters to actual
     # apostrophes
-    description = source[source.find("meta name=\"description\" content=") +
-                         33:].split('"', 1)[0].replace("&#039;", "'")
-    # Generate the obtain field of the embed
-    obtain = await generateobtains(source)
-    # Generate the CA field of the embed
-    chargeattack = await generateca(source)
+    description = parsed.find("meta", {"name": "description"})["content"] \
+        .replace("&#039;", "'")
     # Find weapon image
-    image = source[source.find("og:image\" content=\"") + 19:].split('"', 1)[0]
+    image = parsed.find("meta", {"property": "og:image"})["content"]
+    # Put the basic content together
     embed.description += description
     embed.set_thumbnail(url=image)
-    embed.add_field(name="Obtain", value=obtain, inline=True)
-    embed.add_field(name="Charge Attack: " + chargeattack[0],
-                    value=chargeattack[1], inline=True)
+    # Advanced lookup
+    if not simple:
+        # Generate the obtain field of the embed
+        obtain = await generateobtains(parsed)
+        # Generate the CA field of the embed
+        chargeattack = await generateca(source)
+        # Generate the skills field of the embed
+        skills = await generateskills(parsed)
+        # Put the advanced content together
+        embed.add_field(name="Obtain", value=obtain, inline=True)
+        embed.add_field(name="Charge Attack: " + chargeattack[0],
+                        value=chargeattack[1], inline=True)
+        embed.add_field(name="Skills", value=skills, inline=False)
 
 
 async def generateicons(categories: str, embed) -> None:
@@ -71,17 +81,21 @@ async def generateicons(categories: str, embed) -> None:
         text += " <:Katana1:730458503742750822><:Katana2:730458504011317319>"
     elif "Boost Weapons" in categories:
         text += " <:Boost1:730458765475840091><:Boost2:730458765362593812>"
+    # Assign 4/5★ uncap icons
+    if "4★ Weapons" in categories:
+        text += " <:BlueStar:739887435936301152>"
+    elif "5★ Weapons" in categories:
+        text += " <:BlueStar:739887435936301152><:BlueStar:739887435936301152>"
     embed.description = text + "\n"
 
 
-async def generateobtains(source: str) -> str:
-    # The table for obtain information is inconsistently coded. This checks
-    # which coding method is being used and cleans the input accordingly.
-    parsed = BeautifulSoup(source, 'html.parser')
+async def generateobtains(parsed: BeautifulSoup) -> str:
     obtainlinks = []
     obtaintext = []
     obtain = ""
-    if "class=\"obtain-list-item\">" in source:
+    # The table for obtain information is inconsistently coded. This checks
+    # which coding method is being used and cleans the input accordingly.
+    if parsed.find_all("div", {"class": "obtain-list-item"}):
         # Thank you BS4 very cool
         obtainraw = parsed.find_all("div", {"class": "obtain-list-item"})
         for entry in obtainraw:
@@ -89,8 +103,8 @@ async def generateobtains(source: str) -> str:
             obtainlinks.append(links[len(links) - 1]['href'])
             obtaintext.append(links[len(links) - 1].text)
     else:
-        obtainraw = parsed.find_all("td", {"class": "obtain-list"})
-        links = obtainraw[0].find_all("a")
+        obtainraw = parsed.find("td", {"class": "obtain-list"})
+        links = obtainraw.find_all("a")
         for entry in links:
             obtainlinks.append(entry['href'])
             obtaintext.append(entry.text)
@@ -109,26 +123,50 @@ async def generateca(source) -> list:
         .split("</tr>", 1)[0]
     # ...Mirage Munitions
     if "None" in raw:
-        return ["None", "None"]
+        return ["None", "-"]
     parsed = BeautifulSoup(raw, 'html.parser')
     # Getting the name
     name = parsed.find_all("td", {"class": "skill-name"})[0].text
     # Remove line breaks
     for br in parsed.find_all("br"):
         br.replace_with("\n")
-    # Remove tooltips
-    for br in parsed.find_all("span", {"class": "tooltiptext"}):
-        br.replace_with("")
-    # Remove citations
-    for sup in parsed.find_all("sup"):
-        sup.replace_with("")
-    # Check for charge bar effects
-    for img in parsed.find_all("img", {"alt": "Status Uplift.png"}):
-        img.replace_with("<:ChargeBar:730532683364434092>")
-    for img in parsed.find_all("img", {"alt": "Status Revitalize.png"}):
-        img.replace_with("<:Revitalize:739609067185504318>")
+    # Miscellaneous cleaning
+    removetooltip(parsed)
+    removecitation(parsed)
+    iconreplace(parsed)
     for span in parsed.find_all("span", {"class": "skill-upgrade-text"}):
         span.string.replace_with("**" + span.string + "**")
-    # Basic text output. Upgrade later!
     output = parsed.find_all("td", {"class": ""})[0].text
     return [name, output]
+
+
+async def generateskills(parsed: BeautifulSoup) -> str:
+    # Trim to only what's needed
+    parsed = parsed.find("table", {"class": "wikitable weapon-skills"})
+    output = ""
+    # Remove citations
+    removecitation(parsed)
+    # Generate the output
+    for tr in parsed.find_all("tr"):
+        # Nothing useful here
+        if not tr.get("class"):
+            pass
+        # Skill information
+        elif "skill" in tr["class"]:
+            # Modifier type
+            if "_a_" in tr.find("img")["src"] or "xeno" in \
+                    tr.find("img")["src"]:
+                output += "**(EX)** "
+            elif "_m_" in tr.find("img")["src"]:
+                output += "**(Ω)** "
+            elif "job_weapon" in tr.find("img")["src"]:
+                output += "**(Special)** "
+            else:
+                output += "**(N)** "
+            # Name/description
+            output += tr.find("td", {"class": "skill-name"}).text.strip() + \
+                ": " + tr.find("td", {"class": "skill-desc"}).text + "\n"
+        # Skill upgrade/unlock information
+        elif "skill-upgrade-text" in tr["class"]:
+            output += "__" + tr.find_all("td")[1].text + "__\n"
+    return output
