@@ -2,6 +2,8 @@ import discord
 from icons import iconreplace
 from util import *
 
+BIG = ["Draconic Weapons", "Ultima Weapons", "Dark Opus Weapons"]
+
 
 async def weaponparse(categories: str, source: str, embed: discord.Embed,
                       simple: bool) -> None:
@@ -26,7 +28,10 @@ async def weaponparse(categories: str, source: str, embed: discord.Embed,
         # Generate the CA field of the embed
         chargeattack = await generateca(source)
         # Generate the skills field of the embed
-        skills = await generateskills(parsed)
+        if any(x in categories for x in BIG):
+            skills = await generateskills(parsed, True)
+        else:
+            skills = await generateskills(parsed, False)
         # Put the advanced content together
         embed.add_field(name="Obtain", value=obtain, inline=True)
         embed.add_field(name="Charge Attack: " + chargeattack[0],
@@ -140,7 +145,7 @@ async def generateca(source) -> list:
     return [name, output]
 
 
-async def generateskills(parsed: BeautifulSoup) -> str:
+async def generateskills(parsed: BeautifulSoup, big: bool) -> str:
     # Trim to only what's needed
     parsed = parsed.find("table", {"class": "wikitable weapon-skills"})
     output = ""
@@ -169,5 +174,9 @@ async def generateskills(parsed: BeautifulSoup) -> str:
                 ": " + tr.find("td", {"class": "skill-desc"}).text + "\n"
         # Skill upgrade/unlock information
         elif "skill-upgrade-text" in tr["class"]:
-            output += "__" + tr.find_all("td")[1].text + "__\n"
+            if "skill-unlock" in tr["class"] and big:
+                output += "Remaining skills too large to display. Check the " \
+                          "wiki for full details."
+            else:
+                output += "__" + tr.find_all("td")[1].text + "__\n"
     return output
