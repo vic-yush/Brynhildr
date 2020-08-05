@@ -69,6 +69,7 @@ async def generateobtain(source: str) -> str:
     obtainlinks = []
     obtain = ""
     parsed = BeautifulSoup(raw, "html.parser")
+    removetooltip(parsed)
     # Generate link-text pairs
     for a in parsed.find_all("a"):
         obtainlinks.append(a["href"])
