@@ -177,6 +177,7 @@ async def generateskills(parsed: BeautifulSoup, big: bool) -> str:
             if "skill-unlock" in tr["class"] and big:
                 output += "Remaining skills too large to display. Check the " \
                           "wiki for full details."
+                return output
             else:
                 output += "__" + tr.find_all("td")[1].text + "__\n"
     return output
