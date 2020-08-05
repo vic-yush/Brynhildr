@@ -18,7 +18,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.1b"
+VERSION = "v1.1"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
