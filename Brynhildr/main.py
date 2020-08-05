@@ -36,13 +36,13 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    if re.search("s<(.*)>", message.content):
-        await lookup(re.search("s<(.*)>", message.content).group(1), message,
+    if re.search("s\[(.*)\]", message.content):
+        await lookup(re.search("s\[(.*)\]", message.content).group(1), message,
                      True, True)
-    elif re.search("<(.*)>", message.content):
-        await lookup(re.search("<(.*)>", message.content).group(1), message,
+    elif re.search("\[(.*)\]", message.content):
+        await lookup(re.search("\[(.*)\]", message.content).group(1), message,
                      False, True)
-    elif message.content.lower().startswith(MENTIONS) or client.user in \
+    if message.content.lower().startswith(MENTIONS) or client.user in \
             message.mentions:
         if "remind me" in message.content.lower():
             await reminder(message.content.lower(), message)
@@ -106,7 +106,7 @@ async def changelog(message) -> None:
                                        "command, since the normal lookup "
                                        "command is getting rather big\n - Lazy "
                                        "lookup is now available by surrounding "
-                                       "your search query with <>, or s<> if "
+                                       "your search query with [], or s[] if "
                                        "you'd like simple lookup")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
@@ -122,21 +122,21 @@ async def manual(message) -> None:
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.set_author(name="Help")
-    embed.add_field(name="Reminder", value="**@Brynhildr remindme \"[action]\" "
-                                           "[time]** | Basic reminder function."
+    embed.add_field(name="Reminder", value="**@Brynhildr remindme \"(action)\" "
+                                           "(time)** | Basic reminder function."
                                            " Warning: the bot is in active "
                                            "development and constant reboots "
                                            "mean that reminders over a longer "
                                            "time period may be lost.",
                     inline=False)
-    embed.add_field(name="GBF Lookup", value="**@Brynhildr lookup [item]** | "
+    embed.add_field(name="GBF Lookup", value="**@Brynhildr lookup (item)** | "
                                              "Lookup of pages from the GBF wiki"
                                              ". Currently, only weapon, summon "
                                              "and playable character lookup is "
                                              "supported.",
                     inline=False)
     embed.add_field(name="Simple GBF Lookup", value="**@Brynhildr lookupsimple"
-                                                    " [item]** | "
+                                                    " (item)** | "
                                                     "Lookup of pages from the "
                                                     "GBF wiki, with less "
                                                     "information and in a "
@@ -145,8 +145,8 @@ async def manual(message) -> None:
                                                     " playable character lookup"
                                                     " is supported.",
                     inline=False)
-    embed.add_field(name="Lazy GBF Lookup", value="**<[item]> anywhere in your "
-                                                  "message; s<[item]> for "
+    embed.add_field(name="Lazy GBF Lookup", value="**[(item)] anywhere in your "
+                                                  "message; s[(item)] for "
                                                   "simple lookup | Functionally"
                                                   " identical to normal lookup,"
                                                   " but less effort to call.")
