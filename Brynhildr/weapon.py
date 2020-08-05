@@ -159,7 +159,8 @@ async def generateskills(parsed: BeautifulSoup) -> str:
                 output += "**(EX)** "
             elif "_m_" in tr.find("img")["src"]:
                 output += "**(Ω)** "
-            elif "job_weapon" in tr.find("img")["src"]:
+            elif "job_weapon" in tr.find("img")["src"] or "hollowsky" in \
+                    tr.find("img")["src"]:
                 output += "**(Special)** "
             else:
                 output += "**(N)** "
