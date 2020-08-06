@@ -32,3 +32,7 @@ v1.1
 - Summons now have their auras and calls listed
 - Simple lookup is now available with the "lookupsimple" command, since the normal lookup command is getting rather big
 - Lazy lookup is now available by surrounding your search query with [], or s[] if you'd like simple lookup.
+v1.11
+- Fixed formatting errors on help page
+- Fixed Ultima Weapons sneaking past the large skill table check and breaking the bot
+- More icons added
