@@ -403,4 +403,4 @@ async def lookuplol() -> None:
     return
 
 
-client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")
+client.run(TOKEN)
