@@ -70,8 +70,6 @@ async def changelog(message) -> None:
     """
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.02", value="- Fixed weapon lookups with edge cases"
-                                        "\n- Minor help page reformatting")
     embed.add_field(name="v1.03", value="- Fixed Luminiera weapon lookups "
                                         "crashing the bot\n- Apostrophes in "
                                         "descriptions display properly now")
@@ -137,8 +135,7 @@ async def manual(message) -> None:
                                              "Lookup of pages from the GBF wiki"
                                              ". Currently, only weapon, summon "
                                              "and playable character lookup is "
-                                             "supported.",
-                    inline=False)
+                                             "supported.", inline=False)
     embed.add_field(name="Simple GBF Lookup", value="**@Brynhildr lookupsimple"
                                                     " (item)** | "
                                                     "Lookup of pages from the "
@@ -154,7 +151,8 @@ async def manual(message) -> None:
                                                   "for simple lookup | "
                                                   "Functionally identical to "
                                                   "normal lookup, but less "
-                                                  "effort to use.")
+                                                  "effort to use.",
+                    inline=False)
     await message.channel.send(embed=embed)
     return
 
@@ -391,11 +389,11 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
     embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki."
                           " • Brynhildr " + VERSION)
     embed.timestamp = datetime.datetime.utcnow()
-    # try:
-    await message.channel.send(embed=embed)
-    # except:
-    #     await message.channel.send("Something went wrong. Please let the bot"
-    #                                " owner know so this can be fixed.")
+    try:
+        await message.channel.send(embed=embed)
+    except:
+        await message.channel.send("Something went wrong. Please let the bot"
+                                   " owner know so this can be fixed.")
 
 
 async def lookuplol() -> None:
