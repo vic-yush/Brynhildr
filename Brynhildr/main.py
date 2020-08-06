@@ -18,7 +18,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.1"
+VERSION = "v1.11"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -108,6 +108,10 @@ async def changelog(message) -> None:
                                        "lookup is now available by surrounding "
                                        "your search query with [], or s[] if "
                                        "you'd like simple lookup")
+    embed.add_field(name="v1.11", value="- Fixed formatting errors on help page"
+                                        "\n- Fixed Ultima Weapons sneaking past"
+                                        "the large skill table check and "
+                                        "breaking the bot\n- More icons added")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
@@ -145,11 +149,12 @@ async def manual(message) -> None:
                                                     " playable character lookup"
                                                     " is supported.",
                     inline=False)
-    embed.add_field(name="Lazy GBF Lookup", value="**[(item)] anywhere in your "
-                                                  "message; s[(item)] for "
-                                                  "simple lookup | Functionally"
-                                                  " identical to normal lookup,"
-                                                  " but less effort to call.")
+    embed.add_field(name="Lazy GBF Lookup", value="**[(item)]** anywhere in "
+                                                  "your message; **s[(item)]** "
+                                                  "for simple lookup | "
+                                                  "Functionally identical to "
+                                                  "normal lookup, but less "
+                                                  "effort to use.")
     await message.channel.send(embed=embed)
     return
 
@@ -398,4 +403,4 @@ async def lookuplol() -> None:
     return
 
 
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")

@@ -174,7 +174,8 @@ async def generateskills(parsed: BeautifulSoup, big: bool) -> str:
                 ": " + tr.find("td", {"class": "skill-desc"}).text + "\n"
         # Skill upgrade/unlock information
         elif "skill-upgrade-text" in tr["class"]:
-            if "skill-unlock" in tr["class"] and big:
+            if "skill-unlock" in tr["class"] and big or "alternate" in \
+                    tr["class"] and big:
                 output += "Remaining skills too large to display. Check the " \
                           "wiki for full details."
                 return output
