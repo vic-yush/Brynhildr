@@ -1,11 +1,11 @@
-v1.0:
+v1.0
 - First operational build!
 - Supports basic GBF wiki lookup for weapons
-v1.01:
+v1.01
 - Added change log
 - Added warning for users attempting to set long reminders
 - Added help command functionality
-v1.02:
+v1.02
 - Fixed weapon lookups with edge cases
 - Minor help page reformatting
 v1.03
@@ -35,4 +35,11 @@ v1.1
 v1.11
 - Fixed formatting errors on help page
 - Fixed Ultima Weapons sneaking past the large skill table check and breaking the bot
+- More icons added
+v1.2
+- Event lookup is now available (event lookup is in an early state, and may produce errors)
+- Anonymous search logging has been added to collect data to identify bugs and other issues (privacy policy is available in the support server)
+- Help page updated to now include the command for the help page, which apparently wasn't there before
+- A new help page solely for GBF lookup is now available by calling "@Brynhildr wikihelp"
+- A new command to get an invite to the support server DM'd to you is now available by calling "@Brynhildr discord"
 - More icons added
