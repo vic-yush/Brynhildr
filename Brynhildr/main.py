@@ -5,9 +5,12 @@ import datetime
 import pytz
 import re
 import requests
-from weapon import weaponparse
+from event import eventparse
 from character import characterparse
 from summon import summonparse
+from tinydb import TinyDB, Query
+from tinydb.operations import increment
+from weapon import weaponparse
 
 client = discord.Client()
 
@@ -18,7 +21,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.11"
+VERSION = "v1.2"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -27,9 +30,9 @@ TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
-    await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching,
-                                  name="the stars"))
+    activity = discord.Activity(name='the stars',
+                                type=discord.ActivityType.watching)
+    await client.change_presence(activity=activity)
 
 
 @client.event
@@ -44,7 +47,9 @@ async def on_message(message):
                      False, True)
     if message.content.lower().startswith(MENTIONS) or client.user in \
             message.mentions:
-        if "remind me" in message.content.lower():
+        if "updateannounce" in message.content.lower():
+            await updateannounce(message)
+        elif "remind me" in message.content.lower():
             await reminder(message.content.lower(), message)
         elif "remindme" in message.content.lower():
             await reminderstripped(message.content.lower(), message)
@@ -52,12 +57,20 @@ async def on_message(message):
             await lookup(message.content, message, True, False)
         elif "lookup" in message.content.lower():
             await lookup(message.content, message, False, False)
+        elif "wikihelp" in message.content.lower():
+            await wikihelp(message)
         elif "help" in message.content.lower():
             await manual(message)
+        elif "discord" in message.content.lower():
+            await discordinvite(message)
         elif "changelog" in message.content.lower():
             await changelog(message)
         elif "zeta" in message.content.lower():
             await zeta(message)
+        elif "botstats" in message.content.lower():
+            await botstats(message)
+        elif "topsearches" in message.content.lower():
+            await topsearches(message)
     elif message.content.lower() == "bad bot":
         await message.channel.send("Bad human")
     elif message.content.lower() == "good bot":
@@ -68,93 +81,222 @@ async def changelog(message) -> None:
     """
     Change log. Manually typed because file I/O is effort.
     """
+    await message.channel.trigger_typing()
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.03", value="- Fixed Luminiera weapon lookups "
-                                        "crashing the bot\n- Apostrophes in "
-                                        "descriptions display properly now")
-    embed.add_field(name="v1.04", value="- Added weapon category icons and"
-                                        " retrieval timestamps to weapon "
-                                        "lookups")
     embed.add_field(name="v1.05", value="- Replaced element icons with higher-"
-                                        "resolution versions\n- Clarity pass "
-                                        "on help text")
+                    "resolution versions\n- Clarity pass on help text",
+                    inline=False)
     embed.add_field(name="v1.06", value="- Added character and summon "
-                                        "lookup functionality\n- Moved icons "
-                                        "below titles")
+                    "lookup functionality\n- Moved icons below titles",
+                    inline=False)
     embed.add_field(name="v1.07", value="- Migrated advanced HTML parsing to "
-                                        "BeautifulSoup4. This has no effect on"
-                                        " what you see, but it saves vic a lot"
-                                        " of sanity.\n- Weapon lookup now has "
-                                        "basic Charge Attack information. "
-                                        "Please let vic know if something is "
-                                        "missing an icon!")
+                    "BeautifulSoup4. This has no effect on what you see, but it"
+                    " saves vic a lot of sanity.\n- Weapon lookup now has basic"
+                    " Charge Attack information. Please let vic know if "
+                    "something is missing an icon!", inline=False)
     embed.add_field(name="v1.1", value="- HUGE update!\n- Finalized migrating "
-                                       "advanced HTML parsing to BS4\n- Added "
-                                       "4/5★ uncap stars\n- Characters "
-                                       "obtainable via Premium Draw now have "
-                                       "their recruitment weapon listed\n- "
-                                       "Weapons now have their skills and "
-                                       "charge attacks included in lookup\n- "
-                                       "Characters now have their charge "
-                                       "attacks, skills, and subskills listed\n"
-                                       "- Summons now have their auras and "
-                                       "calls listed\n- Simple lookup is now "
-                                       "available with the \"lookupsimple\" "
-                                       "command, since the normal lookup "
-                                       "command is getting rather big\n - Lazy "
-                                       "lookup is now available by surrounding "
-                                       "your search query with [], or s[] if "
-                                       "you'd like simple lookup")
+                    "advanced HTML parsing to BS4\n- Added 4/5★ uncap stars\n"
+                    "- Characters obtainable via Premium Draw now have their "
+                    "recruitment weapon listed\n- Weapons now have their skills"
+                    " and charge attacks included in lookup\n- Characters now "
+                    "have their charge attacks, skills, and subskills listed\n"
+                    "- Summons now have their auras and calls listed\n- Simple "
+                    "lookup is now available with the \"lookupsimple\" command,"
+                    " since the normal lookup command is getting rather big\n "
+                    "- Lazy lookup is now available by surrounding your search "
+                    "query with [], or s[] if you'd like simple lookup",
+                    inline=False)
     embed.add_field(name="v1.11", value="- Fixed formatting errors on help page"
-                                        "\n- Fixed Ultima Weapons sneaking past"
-                                        "the large skill table check and "
-                                        "breaking the bot\n- More icons added")
+                    "\n- Fixed Ultima Weapons sneaking past the large skill "
+                    "table check and breaking the bot\n- More icons added",
+                    inline=False)
+    embed.add_field(name="v1.2", value="- Event lookup is now available (event "
+                    "lookup is in an early state, and may produce errors)\n- "
+                    "Anonymous search logging has been added to collect data to"
+                    " identify bugs and other issues (privacy policy is "
+                    "available in the support server)\n- Help page updated to "
+                    "now include the command for the help page, which "
+                    "apparently wasn't there before\n- A new help page solely "
+                    "for GBF lookup is now available by calling \"@Brynhildr "
+                    "wikihelp\"\n- A new command to get an invite to the "
+                    "support server DM'd to you is now available by calling "
+                    "\"@Brynhildr discord\"\n- More icons added", inline=False)
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     await message.channel.send(embed=embed)
     return
+
+
+async def updateannounce(message) -> None:
+    if message.author.id == 438711930408927233 or message.author.id == \
+            262236299832983582:
+        owners = []
+        update = message.content[message.content.find("announce") + 8:]
+        owners.append(message.guild.owner)
+        # for server in client.guilds:
+        #     if server.owner not in owners:
+        #         owners.append(server)
+        embed = discord.Embed()
+        embed.title = "Brynhildr Bot has been updated"
+        embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
+                                               " • Made with ♥ by vicyush#4018")
+        embed.description = "Brynhildr Bot has been updated to " + VERSION + \
+                            ". No work is needed on your part, this is just a" \
+                            " notification. Version " + VERSION + " brings " \
+                            "the following changes:\n\n" + update + "\n\n" +\
+                            "Thank you for using Brynhildr Bot.\n[Support " \
+                            "server](https://discord.gg/3uRTuMU)"
+        for owner in owners:
+            await owner.send(embed=embed)
 
 
 async def manual(message) -> None:
     """
     Help page. That's really it.
     """
+    await message.channel.trigger_typing()
     embed = discord.Embed()
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.set_author(name="Help")
     embed.add_field(name="Reminder", value="**@Brynhildr remindme \"(action)\" "
-                                           "(time)** | Basic reminder function."
-                                           " Warning: the bot is in active "
-                                           "development and constant reboots "
-                                           "mean that reminders over a longer "
-                                           "time period may be lost.",
+                    "(time)** | Basic reminder function. Warning: the bot is in"
+                    " active development and constant reboots mean that "
+                    "reminders over a longer time period may be lost.",
                     inline=False)
     embed.add_field(name="GBF Lookup", value="**@Brynhildr lookup (item)** | "
-                                             "Lookup of pages from the GBF wiki"
-                                             ". Currently, only weapon, summon "
-                                             "and playable character lookup is "
-                                             "supported.", inline=False)
+                    "Lookup of pages from the GBF wiki. Currently, only weapon,"
+                    " summon, event, and playable character lookup is "
+                    "supported.", inline=False)
     embed.add_field(name="Simple GBF Lookup", value="**@Brynhildr lookupsimple"
-                                                    " (item)** | "
-                                                    "Lookup of pages from the "
-                                                    "GBF wiki, with less "
-                                                    "information and in a "
-                                                    "smaller embed. Currently, "
-                                                    "only weapon, summon and "
-                                                    " playable character lookup"
-                                                    " is supported.",
-                    inline=False)
+                    " (item)** | Lookup of pages from the GBF wiki, with less "
+                    "information and in a smaller embed. Currently, only "
+                    "weapon, summon, event, and  playable character lookup is "
+                    "supported.", inline=False)
     embed.add_field(name="Lazy GBF Lookup", value="**[(item)]** anywhere in "
-                                                  "your message; **s[(item)]** "
-                                                  "for simple lookup | "
-                                                  "Functionally identical to "
-                                                  "normal lookup, but less "
-                                                  "effort to use.",
-                    inline=False)
+                    "your message; **s[(item)]** for simple lookup | "
+                    "Functionally identical to normal lookup, but less effort "
+                    "to use.", inline=False)
+    embed.add_field(name="Help Page", value="**@Brynhildr#9768 help** | Brings "
+                    "up the help page.", inline=False)
+    embed.add_field(name="Wiki Lookup Tips", value="**@Brynhildr wikihelp** | "
+                    "A separate help page just for GBF Wiki lookup, with tips "
+                    "on finding the specific page you want.", inline=False)
+    embed.add_field(name="Support Server Invite", value="**@Brynhildr discord**"
+                    " | DMs an invite to the support server to you.")
     await message.channel.send(embed=embed)
-    return
+
+
+async def wikihelp(message) -> None:
+    await message.channel.trigger_typing()
+    embed = discord.Embed()
+    embed.set_author(name="GBF Wiki Lookup",
+                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
+    embed.title = "Wiki Lookup Tips"
+    embed.description = "The lookup service is built off of the GBF Wiki. A " \
+                        "side effect of this is that searches are spelling " \
+                        "and case sensitive, among other peculiarities:"
+    embed.add_field(name="If a character has multiple versions, its oldest or "
+                    "lowest-rarity version usually gets the \"base\" name",
+                    value="For example, searching only \"Vira\" will return the"
+                    " SR version of her.", inline=False)
+    embed.add_field(name="If a character also exists as a summon or event, the "
+                    "character page usually gets the \"base\" name",
+                    value="For example, searching only \"Grimnir\" will return "
+                    "the playable character, and not the summon.", inline=False)
+    embed.add_field(name="When specifying a specific version, enclose the "
+                    "specification in parentheses",
+                    value="For example, to specify Baal the summon, search "
+                    "\"Baal (Summon)\".", inline=False)
+    embed.add_field(name="Some cases can be tricky",
+                    value="For example, searching \"Robomi (Event)\" will "
+                    "return the SR event character, while \"Robomi (Side Story)"
+                    "\" will return the side story event where you recruit "
+                    "her.", inline=False)
+    embed.add_field(name="Wiki page nicknames are supported",
+                    value="For those more familiar with the wiki, you can use "
+                    "page nicknames and it will still function normally. For "
+                    "example, searching \"AES\" returns Ancient Ecke Sachs, and"
+                    " searching \"Birdman\" returns Nezahualpilli.",
+                    inline=False)
+    embed.add_field(name="Unite and Fight has a special notation",
+                    value="While Unite and Fight event lookup is limited due to"
+                    " its complex nature, it is possible to look up past "
+                    "iterations to check the enemy's element in that event. To "
+                    "search for a specific iteration, add the month and year "
+                    "directly after \"Unite and Fight\", separated by a slash. "
+                    "For example, looking up \"Unite and Fight/May 2019\" will "
+                    "return the May 2019 iteration of Unite and Fight, noting "
+                    "that that iteration featured Water element enemies.",
+                    inline=False)
+    embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
+                                           " • Made with ♥ by vicyush#4018")
+    await message.channel.send(embed=embed)
+
+
+async def discordinvite(message)-> None:
+    await message.author.send("Here is the invite to the Brynhildr Bot support "
+                              "server, as you requested:\n"
+                              "https://discord.gg/3uRTuMU")
+
+
+async def botstats(message) -> None:
+    if message.author.id == 438711930408927233 or message.author.id == \
+            262236299832983582:
+        servers = ""
+        for server in client.guilds:
+            servers += server.name + ", "
+        servers = servers[:-1]
+        await message.channel.send("Servers: " + servers)
+
+
+async def topsearches(message) -> None:
+    if message.author.id != 438711930408927233 or message.author.id != \
+            262236299832983582:
+        return
+    await message.channel.trigger_typing()
+    if message.content.lower().split("topsearches", 1)[1] == "character":
+        db = TinyDB("character.json")
+    elif message.content.lower().split("topsearches", 1)[1] == "summon":
+        db = TinyDB("summon.json")
+    elif message.content.lower().split("topsearches", 1)[1] == "weapon":
+        db = TinyDB("weapon.json")
+    elif message.content.lower().split("topsearches", 1)[1] == "event":
+        db = TinyDB("event.json")
+    else:
+        db = TinyDB("searches.json")
+    searches = db.all()
+    top = []
+    for search in searches:
+        i = 0
+        while i <= 4:
+            if len(top) < i + 1:
+                top.append((search["item"], search["count"]))
+                break
+            elif top[i][1] <= search["count"]:
+                top.insert(i, (search["item"], search["count"]))
+                break
+            i += 1
+    embed = discord.Embed()
+    embed.set_author(name="GBF Wiki Lookup",
+                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
+    embed.title = "Top Searches"
+    embed.description = ""
+    i = 0
+    for item in top[:5]:
+        embed.description += "**" + str(i) + ". " + item[0] + "**: " + \
+                             str(item[1]) + "\n"
+    if message.author.is_on_mobile():
+        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+                              "Wiki. • Brynhildr " + VERSION + "\nSome links "
+                              "may not display properly on mobile.",
+                         icon_url=AVATAR)
+    else:
+        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+                              "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
+    embed.timestamp = datetime.datetime.utcnow()
+    await message.channel.send(embed=embed)
 
 
 async def zeta(message) -> None:
@@ -328,8 +470,8 @@ async def reminderoutput(action: str, delta: datetime.timedelta, message) -> \
     if delta.days > 0 or delta.seconds // 3600 > 1:
         await message.channel.send("Please be careful when asking for reminders"
                                    " over extended periods of time. The bot is "
-                                   "in constant development and will reboot "
-                                   "to implement new changes, losing any "
+                                   "in constant development and will reboot to "
+                                   "implement new changes, losing any "
                                    "reminders that have been set.")
     await asyncio.sleep(delta.seconds + (delta.days * 86400))
     await message.channel.send(message.author.mention +
@@ -353,6 +495,7 @@ async def lookup(command: str, message, simple: bool, quick: bool) -> None:
 
 
 async def lookupgbf(item: str, message, simple: bool) -> None:
+    await message.channel.trigger_typing()
     # Get a page with the given input
     url = "https://gbf.wiki/" + item.replace(" ", "_")
     page = requests.get(url)
@@ -367,6 +510,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
         #                     item.replace(" ", "+"))
         # results = [i for i in range(len(page.text)) if page.text.startswith
         #            ("mw-search-result-heading", i)]
+    search = Query()
     # Create embed
     embed = discord.Embed()
     # Get page categories
@@ -374,20 +518,39 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                            15:].split("]", 1)[0]
     if "\"Weapons\"" in categories:
         await weaponparse(categories, page.text, embed, simple)
+        db = TinyDB("weapon.json")
     elif "\"Characters\"" in categories:
         await characterparse(categories, page.text, embed, simple)
+        db = TinyDB("character.json")
     elif "\"Summons\"" in categories:
         await summonparse(categories, page.text, embed, simple)
+        db = TinyDB("summon.json")
+    elif "\"Events\"" in categories:
+        await eventparse(categories, page.text, embed, simple)
+        db = TinyDB("event.json")
     else:
         await message.channel.send("<:despair:376080252754984960> This is not a"
-                                   " weapon, summon or playable character page."
-                                   " I can't handle those pages right now.")
+                                   " weapon, summon, event, or playable "
+                                   "character page. I can't handle those pages "
+                                   "right now.")
         return
+    for i in range(2):
+        if not db.search(search.item == embed.title):
+            db.insert({"item": item, "count": 1})
+        else:
+            db.update(increment("count"), search.item == embed.title)
+        db = TinyDB("searches.json")
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
-    embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki."
-                          " • Brynhildr " + VERSION)
+    if message.author.is_on_mobile():
+        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+                              "Wiki. • Brynhildr " + VERSION + "\nSome links "
+                              "may not display properly on mobile.",
+                         icon_url=AVATAR)
+    else:
+        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+                              "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     try:
         await message.channel.send(embed=embed)
@@ -401,4 +564,4 @@ async def lookuplol() -> None:
     return
 
 
-client.run(TOKEN)
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.XwO0Ig.Y4om2skeY3Aoqfx0MZp5B27sdqM")
