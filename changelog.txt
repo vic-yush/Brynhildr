@@ -38,7 +38,6 @@ v1.11
 - More icons added
 v1.2
 - Event lookup is now available (event lookup is in an early state, and may produce errors)
-- Anonymous search logging has been added to collect data to identify bugs and other issues (privacy policy is available in the support server)
 - Help page updated to now include the command for the help page, which apparently wasn't there before
 - A new help page solely for GBF lookup is now available by calling "@Brynhildr wikihelp"
 - A new command to get an invite to the support server DM'd to you is now available by calling "@Brynhildr discord"
