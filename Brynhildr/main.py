@@ -134,7 +134,7 @@ async def updateannounce(message) -> None:
         update = message.content[message.content.find("announce") + 8:]
         for server in client.guilds:
             if server.owner not in owners:
-                owners.append(server)
+                owners.append(server.owner)
         embed = discord.Embed()
         embed.title = "Brynhildr Bot has been updated"
         embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
