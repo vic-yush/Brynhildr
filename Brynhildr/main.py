@@ -8,8 +8,8 @@ import requests
 from event import eventparse
 from character import characterparse
 from summon import summonparse
-from tinydb import TinyDB, Query
-from tinydb.operations import increment
+# from tinydb import TinyDB, Query
+# from tinydb.operations import increment
 from weapon import weaponparse
 
 client = discord.Client()
@@ -69,8 +69,8 @@ async def on_message(message):
             await zeta(message)
         elif "botstats" in message.content.lower():
             await botstats(message)
-        elif "topsearches" in message.content.lower():
-            await topsearches(message)
+        # elif "topsearches" in message.content.lower():
+        #     await topsearches(message)
     elif message.content.lower() == "bad bot":
         await message.channel.send("Bad human")
     elif message.content.lower() == "good bot":
@@ -113,17 +113,16 @@ async def changelog(message) -> None:
                     inline=False)
     embed.add_field(name="v1.2", value="- Event lookup is now available (event "
                     "lookup is in an early state, and may produce errors)\n- "
-                    "Anonymous search logging has been added to collect data to"
-                    " identify bugs and other issues (privacy policy is "
-                    "available in the support server)\n- Help page updated to "
-                    "now include the command for the help page, which "
-                    "apparently wasn't there before\n- A new help page solely "
-                    "for GBF lookup is now available by calling \"@Brynhildr "
-                    "wikihelp\"\n- A new command to get an invite to the "
-                    "support server DM'd to you is now available by calling "
-                    "\"@Brynhildr discord\"\n- More icons added", inline=False)
+                    "Help page updated to now include the command for the help "
+                    "page, which apparently wasn't there before\n- A new help "
+                    "page solely for GBF lookup is now available by calling "
+                    "\"@Brynhildr wikihelp\"\n- A new command to get an invite "
+                    "to the support server DM'd to you is now available by "
+                    "calling \"@Brynhildr discord\"\n- More icons added",
+                    inline=False)
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
+    embed.timestamp = datetime.datetime.utcnow()
     await message.channel.send(embed=embed)
     return
 
@@ -133,10 +132,9 @@ async def updateannounce(message) -> None:
             262236299832983582:
         owners = []
         update = message.content[message.content.find("announce") + 8:]
-        owners.append(message.guild.owner)
-        # for server in client.guilds:
-        #     if server.owner not in owners:
-        #         owners.append(server)
+        for server in client.guilds:
+            if server.owner not in owners:
+                owners.append(server)
         embed = discord.Embed()
         embed.title = "Brynhildr Bot has been updated"
         embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
@@ -147,6 +145,7 @@ async def updateannounce(message) -> None:
                             "the following changes:\n\n" + update + "\n\n" +\
                             "Thank you for using Brynhildr Bot.\n[Support " \
                             "server](https://discord.gg/3uRTuMU)"
+        embed.timestamp = datetime.datetime.utcnow()
         for owner in owners:
             await owner.send(embed=embed)
 
@@ -185,6 +184,7 @@ async def manual(message) -> None:
                     "on finding the specific page you want.", inline=False)
     embed.add_field(name="Support Server Invite", value="**@Brynhildr discord**"
                     " | DMs an invite to the support server to you.")
+    embed.timestamp = datetime.datetime.utcnow()
     await message.channel.send(embed=embed)
 
 
@@ -232,6 +232,7 @@ async def wikihelp(message) -> None:
                     inline=False)
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
+    embed.timestamp = datetime.datetime.utcnow()
     await message.channel.send(embed=embed)
 
 
@@ -251,52 +252,52 @@ async def botstats(message) -> None:
         await message.channel.send("Servers: " + servers)
 
 
-async def topsearches(message) -> None:
-    if message.author.id != 438711930408927233 or message.author.id != \
-            262236299832983582:
-        return
-    await message.channel.trigger_typing()
-    if message.content.lower().split("topsearches", 1)[1] == "character":
-        db = TinyDB("character.json")
-    elif message.content.lower().split("topsearches", 1)[1] == "summon":
-        db = TinyDB("summon.json")
-    elif message.content.lower().split("topsearches", 1)[1] == "weapon":
-        db = TinyDB("weapon.json")
-    elif message.content.lower().split("topsearches", 1)[1] == "event":
-        db = TinyDB("event.json")
-    else:
-        db = TinyDB("searches.json")
-    searches = db.all()
-    top = []
-    for search in searches:
-        i = 0
-        while i <= 4:
-            if len(top) < i + 1:
-                top.append((search["item"], search["count"]))
-                break
-            elif top[i][1] <= search["count"]:
-                top.insert(i, (search["item"], search["count"]))
-                break
-            i += 1
-    embed = discord.Embed()
-    embed.set_author(name="GBF Wiki Lookup",
-                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
-    embed.title = "Top Searches"
-    embed.description = ""
-    i = 0
-    for item in top[:5]:
-        embed.description += "**" + str(i) + ". " + item[0] + "**: " + \
-                             str(item[1]) + "\n"
-    if message.author.is_on_mobile():
-        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-                              "Wiki. • Brynhildr " + VERSION + "\nSome links "
-                              "may not display properly on mobile.",
-                         icon_url=AVATAR)
-    else:
-        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-                              "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
-    embed.timestamp = datetime.datetime.utcnow()
-    await message.channel.send(embed=embed)
+# async def topsearches(message) -> None:
+#     if message.author.id != 438711930408927233 or message.author.id != \
+#             262236299832983582:
+#         return
+#     await message.channel.trigger_typing()
+#     if message.content.lower().split("topsearches", 1)[1] == "character":
+#         db = TinyDB("character.json")
+#     elif message.content.lower().split("topsearches", 1)[1] == "summon":
+#         db = TinyDB("summon.json")
+#     elif message.content.lower().split("topsearches", 1)[1] == "weapon":
+#         db = TinyDB("weapon.json")
+#     elif message.content.lower().split("topsearches", 1)[1] == "event":
+#         db = TinyDB("event.json")
+#     else:
+#         db = TinyDB("searches.json")
+#     searches = db.all()
+#     top = []
+#     for search in searches:
+#         i = 0
+#         while i <= 4:
+#             if len(top) < i + 1:
+#                 top.append((search["item"], search["count"]))
+#                 break
+#             elif top[i][1] <= search["count"]:
+#                 top.insert(i, (search["item"], search["count"]))
+#                 break
+#             i += 1
+#     embed = discord.Embed()
+#     embed.set_author(name="GBF Wiki Lookup",
+#                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
+#     embed.title = "Top Searches"
+#     embed.description = ""
+#     i = 0
+#     for item in top[:5]:
+#         embed.description += "**" + str(i) + ". " + item[0] + "**: " + \
+#                              str(item[1]) + "\n"
+#     if message.author.is_on_mobile():
+#         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+#                               "Wiki. • Brynhildr " + VERSION + "\nSome links "
+#                               "may not display properly on mobile.",
+#                          icon_url=AVATAR)
+#     else:
+#         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+#                               "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
+#     embed.timestamp = datetime.datetime.utcnow()
+#     await message.channel.send(embed=embed)
 
 
 async def zeta(message) -> None:
@@ -510,7 +511,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
         #                     item.replace(" ", "+"))
         # results = [i for i in range(len(page.text)) if page.text.startswith
         #            ("mw-search-result-heading", i)]
-    search = Query()
+    # search = Query()
     # Create embed
     embed = discord.Embed()
     # Get page categories
@@ -518,28 +519,28 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                            15:].split("]", 1)[0]
     if "\"Weapons\"" in categories:
         await weaponparse(categories, page.text, embed, simple)
-        db = TinyDB("weapon.json")
+        # db = TinyDB("weapon.json")
     elif "\"Characters\"" in categories:
         await characterparse(categories, page.text, embed, simple)
-        db = TinyDB("character.json")
+        # db = TinyDB("character.json")
     elif "\"Summons\"" in categories:
         await summonparse(categories, page.text, embed, simple)
-        db = TinyDB("summon.json")
+        # db = TinyDB("summon.json")
     elif "\"Events\"" in categories:
         await eventparse(categories, page.text, embed, simple)
-        db = TinyDB("event.json")
+        # db = TinyDB("event.json")
     else:
         await message.channel.send("<:despair:376080252754984960> This is not a"
                                    " weapon, summon, event, or playable "
                                    "character page. I can't handle those pages "
                                    "right now.")
         return
-    for i in range(2):
-        if not db.search(search.item == embed.title):
-            db.insert({"item": item, "count": 1})
-        else:
-            db.update(increment("count"), search.item == embed.title)
-        db = TinyDB("searches.json")
+    # for i in range(2):
+    #     if not db.search(search.item == embed.title):
+    #         db.insert({"item": item, "count": 1})
+    #     else:
+    #         db.update(increment("count"), search.item == embed.title)
+    #     db = TinyDB("searches.json")
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
