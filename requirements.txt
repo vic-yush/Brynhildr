@@ -2,5 +2,4 @@ discord.py
 dateparser==0.7.6
 pytz==2020.1
 requests==2.24.0
-tinydb
 bs4
