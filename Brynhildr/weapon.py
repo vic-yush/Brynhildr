@@ -124,8 +124,7 @@ async def generateobtains(parsed: BeautifulSoup) -> str:
 
 async def generateca(source) -> list:
     # Cutting out unneeded bits
-    raw = source[source.find("<img alt=\"Skill"):] \
-        .split("</tr>", 1)[0]
+    raw = source[source.find("<img alt=\"Skill"):].split("</tr>", 1)[0]
     # ...Mirage Munitions
     if "None" in raw:
         return ["None", "-"]
