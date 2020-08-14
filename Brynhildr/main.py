@@ -462,10 +462,6 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
     embed = discord.Embed()
     # Check if the input returns a valid page
     if "There is currently no text in this page." in page.text:
-        # await message.channel.send("<:despair:376080252754984960> "
-        #                            "Could not find this item. Search "
-        #                            "functionality will be added soon.")
-        # return
         url = "https://gbf.wiki/index.php?search=" + item.replace(" ", "+")
         page = requests.get(url)
         await gbfsearch(item, page.text, message, embed, simple)
@@ -568,7 +564,7 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
             i += 1
             if i >= 6:
                 break
-    else:
+    if parsed.find("p", {"class": "mw-search-nonefound"}) or not resultsearch:
         embed.title = "No results found for \"" + item + "\""
         output = await message.channel.send(embed=embed)
         await message.remove_reaction(CLOCK, client.user)
