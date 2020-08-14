@@ -13,8 +13,11 @@ def iconreplace(parsed: BeautifulSoup) -> None:
     for img in parsed.find_all("img"):
         # BUFFS
 
+        # Armoured
+        if img["alt"] == "Status Armored.png":
+            img.replace_with("<:Armored:730830371058614282>")
         # Attack up
-        if img["alt"] == "Status AttackUp.png":
+        elif img["alt"] == "Status AttackUp.png":
             img.replace_with("<:AttackUp:730824577651048539>")
         # Bonus damage
         elif img["alt"] == "Status Bonus Damage.png":
@@ -25,6 +28,9 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Critical up (Water)
         elif img["alt"] == "Status CriticalUpWater.png":
             img.replace_with("<:CriticalUpWater:741028610433089698>")
+        # Dispel cancel
+        elif img["alt"] == "Status Dispel Cancel.png":
+            img.replace_with("<:DispelCancel:743651794269503520>")
         # Defense up
         elif img["alt"] == "Status DefenseUp.png":
             img.replace_with("<:DefenseUp:730824577478950933>")
@@ -66,6 +72,9 @@ def iconreplace(parsed: BeautifulSoup) -> None:
             img.replace_with("<:Veil:741033069548404819>")
 
         # Elemental ATK up
+        # Fire
+        elif img["alt"] == "Status FireAtkUp.png":
+            img.replace_with("<:FireAtkUp:741720282414186526>")
         # Water
         elif img["alt"] == "Status WaterAtkUp.png":
             img.replace_with("<:WaterAtkUp:741720282640678963>")
@@ -94,6 +103,14 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Fire (70%)
         elif img["alt"] == "Status Fire Cut 70.png":
             img.replace_with("<:FC70:730877406604296213>")
+        # Wind (40%)
+        elif img["alt"] == "Status Wind Cut 40.png":
+            img.replace_with("<:GC40:730884667007434793>")
+
+        # Element Switches
+        # Wind
+        elif img["alt"] == "Status Wind Switch.png":
+            img.replace_with("<:WindSwitch:743648516538105906>")
 
         # DEBUFFS
 
@@ -118,6 +135,12 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Defense down (3 turn)
         elif img["alt"] == "Status DEF Down 3.png":
             img.replace_with("<:DefenseDown3:741033218014314586>")
+        # Defense down (stackable)
+        elif img["alt"] == "Status DefenseDownStack.png":
+            img.replace_with("<:DefenseDownStack:743649616708370513>")
+        # Double Attack down (6 turn)
+        elif img["alt"] == "Status DoubleDown.png":
+            img.replace_with("<:DoubleDown:743650508677578823>")
         # Double Attack down (6 turn)
         elif img["alt"] == "Status DA Down 6.png":
             img.replace_with("<:DoubleDown6:741037392378462269>")
@@ -135,6 +158,9 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Sleep
         elif img["alt"] == "Status Sleep.png":
             img.replace_with("<:Sleep:741038697323036673>")
+        # Triple Attack down
+        elif img["alt"] == "Status TripleDown.png":
+            img.replace_with("<:TripleDown6:741037392437182524>")
         # Triple Attack down (6 turn)
         elif img["alt"] == "Status TA Down 6.png":
-            img.replace_with("<:TripleDown6:741037392437182524>")
+            img.replace_with("<:TripleDown:743650508715327610>")

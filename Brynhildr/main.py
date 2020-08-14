@@ -5,11 +5,10 @@ import datetime
 import pytz
 import re
 import requests
+from bs4 import BeautifulSoup
 from event import eventparse
 from character import characterparse
 from summon import summonparse
-# from tinydb import TinyDB, Query
-# from tinydb.operations import increment
 from weapon import weaponparse
 
 client = discord.Client()
@@ -21,10 +20,15 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.2"
+VERSION = "v1.3"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
          "30ea82c1d3280792e98.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
+
+CLOCK = "\U0001F551"
+QUESTION_MARK = "\U00002753"
+CHECK_MARK = "\U00002714"
+ERROR = "\U0000274C"
 
 
 @client.event
@@ -69,8 +73,6 @@ async def on_message(message):
             await zeta(message)
         elif "botstats" in message.content.lower():
             await botstats(message)
-        # elif "topsearches" in message.content.lower():
-        #     await topsearches(message)
     elif message.content.lower() == "bad bot":
         await message.channel.send("Bad human")
     elif message.content.lower() == "good bot":
@@ -84,13 +86,10 @@ async def changelog(message) -> None:
     await message.channel.trigger_typing()
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.05", value="- Replaced element icons with higher-"
-                    "resolution versions\n- Clarity pass on help text",
-                    inline=False)
-    embed.add_field(name="v1.06", value="- Added character and summon "
+    embed.add_field(name="v1.0.6", value="- Added character and summon "
                     "lookup functionality\n- Moved icons below titles",
                     inline=False)
-    embed.add_field(name="v1.07", value="- Migrated advanced HTML parsing to "
+    embed.add_field(name="v1.0.7", value="- Migrated advanced HTML parsing to "
                     "BeautifulSoup4. This has no effect on what you see, but it"
                     " saves vic a lot of sanity.\n- Weapon lookup now has basic"
                     " Charge Attack information. Please let vic know if "
@@ -107,9 +106,9 @@ async def changelog(message) -> None:
                     "- Lazy lookup is now available by surrounding your search "
                     "query with [], or s[] if you'd like simple lookup",
                     inline=False)
-    embed.add_field(name="v1.11", value="- Fixed formatting errors on help page"
-                    "\n- Fixed Ultima Weapons sneaking past the large skill "
-                    "table check and breaking the bot\n- More icons added",
+    embed.add_field(name="v1.1.1", value="- Fixed formatting errors on help "
+                    "page\n- Fixed Ultima Weapons sneaking past the large skill"
+                    " table check and breaking the bot\n- More icons added",
                     inline=False)
     embed.add_field(name="v1.2", value="- Event lookup is now available (event "
                     "lookup is in an early state, and may produce errors)\n- "
@@ -120,6 +119,12 @@ async def changelog(message) -> None:
                     "to the support server DM'd to you is now available by "
                     "calling \"@Brynhildr discord\"\n- More icons added",
                     inline=False)
+    embed.add_field(name="v1.3", value="- Search functionality is now available"
+                    " and will automatically initialize on searches that do not"
+                    " return an existing page\n- Interactive reactions have "
+                    "been added, allowing you to interact with search results "
+                    "and remove lookups once you're done with them if desired\n"
+                    "- More icons added")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.timestamp = datetime.datetime.utcnow()
@@ -250,54 +255,6 @@ async def botstats(message) -> None:
             servers += server.name + ", "
         servers = servers[:-1]
         await message.channel.send("Servers: " + servers)
-
-
-# async def topsearches(message) -> None:
-#     if message.author.id != 438711930408927233 or message.author.id != \
-#             262236299832983582:
-#         return
-#     await message.channel.trigger_typing()
-#     if message.content.lower().split("topsearches", 1)[1] == "character":
-#         db = TinyDB("character.json")
-#     elif message.content.lower().split("topsearches", 1)[1] == "summon":
-#         db = TinyDB("summon.json")
-#     elif message.content.lower().split("topsearches", 1)[1] == "weapon":
-#         db = TinyDB("weapon.json")
-#     elif message.content.lower().split("topsearches", 1)[1] == "event":
-#         db = TinyDB("event.json")
-#     else:
-#         db = TinyDB("searches.json")
-#     searches = db.all()
-#     top = []
-#     for search in searches:
-#         i = 0
-#         while i <= 4:
-#             if len(top) < i + 1:
-#                 top.append((search["item"], search["count"]))
-#                 break
-#             elif top[i][1] <= search["count"]:
-#                 top.insert(i, (search["item"], search["count"]))
-#                 break
-#             i += 1
-#     embed = discord.Embed()
-#     embed.set_author(name="GBF Wiki Lookup",
-#                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
-#     embed.title = "Top Searches"
-#     embed.description = ""
-#     i = 0
-#     for item in top[:5]:
-#         embed.description += "**" + str(i) + ". " + item[0] + "**: " + \
-#                              str(item[1]) + "\n"
-#     if message.author.is_on_mobile():
-#         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-#                               "Wiki. • Brynhildr " + VERSION + "\nSome links "
-#                               "may not display properly on mobile.",
-#                          icon_url=AVATAR)
-#     else:
-#         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-#                               "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
-#     embed.timestamp = datetime.datetime.utcnow()
-#     await message.channel.send(embed=embed)
 
 
 async def zeta(message) -> None:
@@ -497,50 +454,42 @@ async def lookup(command: str, message, simple: bool, quick: bool) -> None:
 
 async def lookupgbf(item: str, message, simple: bool) -> None:
     await message.channel.trigger_typing()
+    await message.add_reaction(CLOCK)
     # Get a page with the given input
     url = "https://gbf.wiki/" + item.replace(" ", "_")
     page = requests.get(url)
-    # Check if the input returns a valid page
-    if "There is currently no text in this page." in page.text:
-        await message.channel.send("<:despair:376080252754984960> "
-                                   "Could not find this item. Search "
-                                   "functionality will be added soon.")
-        return
-        # TODO: Add search functionality
-        # page = requests.get("https://gbf.wiki/index.php?search=" +
-        #                     item.replace(" ", "+"))
-        # results = [i for i in range(len(page.text)) if page.text.startswith
-        #            ("mw-search-result-heading", i)]
-    # search = Query()
     # Create embed
     embed = discord.Embed()
-    # Get page categories
-    categories = page.text[page.text.find("wgCategories") +
-                           15:].split("]", 1)[0]
-    if "\"Weapons\"" in categories:
-        await weaponparse(categories, page.text, embed, simple)
-        # db = TinyDB("weapon.json")
-    elif "\"Characters\"" in categories:
-        await characterparse(categories, page.text, embed, simple)
-        # db = TinyDB("character.json")
-    elif "\"Summons\"" in categories:
-        await summonparse(categories, page.text, embed, simple)
-        # db = TinyDB("summon.json")
-    elif "\"Events\"" in categories:
-        await eventparse(categories, page.text, embed, simple)
-        # db = TinyDB("event.json")
-    else:
-        await message.channel.send("<:despair:376080252754984960> This is not a"
-                                   " weapon, summon, event, or playable "
-                                   "character page. I can't handle those pages "
-                                   "right now.")
+    # Check if the input returns a valid page
+    if "There is currently no text in this page." in page.text:
+        # await message.channel.send("<:despair:376080252754984960> "
+        #                            "Could not find this item. Search "
+        #                            "functionality will be added soon.")
+        # return
+        url = "https://gbf.wiki/index.php?search=" + item.replace(" ", "+")
+        page = requests.get(url)
+        await gbfsearch(item, page.text, message, embed, simple)
         return
-    # for i in range(2):
-    #     if not db.search(search.item == embed.title):
-    #         db.insert({"item": item, "count": 1})
-    #     else:
-    #         db.update(increment("count"), search.item == embed.title)
-    #     db = TinyDB("searches.json")
+    else:
+        # Get page categories
+        categories = page.text[page.text.find("wgCategories") +
+                               15:].split("]", 1)[0]
+        if "\"Weapons\"" in categories:
+            await weaponparse(categories, page.text, embed, simple)
+        elif "\"Characters\"" in categories:
+            await characterparse(categories, page.text, embed, simple)
+        elif "\"Summons\"" in categories:
+            await summonparse(categories, page.text, embed, simple)
+        elif "\"Events\"" in categories:
+            await eventparse(categories, page.text, embed, simple)
+        else:
+            await message.remove_reaction(CLOCK, client.user)
+            await message.add_reaction("<:despair:376080252754984960")
+            await message.channel.send("<:despair:376080252754984960> This is "
+                                       "not a weapon, summon, event, or "
+                                       "playable character page. I can't handle"
+                                       " those pages right now.")
+            return
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
@@ -554,10 +503,142 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                               "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     try:
-        await message.channel.send(embed=embed)
+        output = await message.channel.send(embed=embed)
+        await message.remove_reaction(CLOCK, client.user)
+        await message.add_reaction(CHECK_MARK)
+        await output.add_reaction("\U0001F5D1")
     except:
         await message.channel.send("Something went wrong. Please let the bot"
                                    " owner know so this can be fixed.")
+        await message.remove_reaction(CLOCK, client.user)
+        await message.add_reaction(ERROR)
+        return
+    try:
+        await client.wait_for("reaction_add", timeout=1800, check=react)
+    except asyncio.TimeoutError:
+        await output.remove_reaction("\U0001F5D1", client.user)
+    else:
+        await message.remove_reaction(CHECK_MARK, client.user)
+        await output.delete()
+        await message.add_reaction("\U0001F5D1")
+        await asyncio.sleep(5)
+        await message.remove_reaction("\U0001F5D1", client.user)
+
+
+def react(reaction, user):
+    return user.id != client.user.id and str(reaction.emoji) == "\U0001F5D1"
+
+
+async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
+                    simple: bool) -> None:
+    embed.set_author(name="GBF Wiki Lookup",
+                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
+    if message.author.is_on_mobile():
+        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+                              "Wiki. • Brynhildr " + VERSION + "\nSome links "
+                              "may not display properly on mobile.",
+                         icon_url=AVATAR)
+    else:
+        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
+                              "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
+    embed.timestamp = datetime.datetime.utcnow()
+    parsed = BeautifulSoup(source, "html.parser")
+    if not parsed.find("p", {"class": "mw-search-nonefound"}):
+        results = []
+        resultsearch = []
+        for result in parsed.find_all("div", {"class":
+                                              "mw-search-result-heading"}):
+            valid = True
+            for a in result.find_all("a"):
+                if a["href"].count("/") > 1:
+                    valid = False
+                    break
+                resultsearch.append(a.text)
+                a.replace_with("[" + a.text + "](https://gbf.wiki" + a["href"] +
+                               ")")
+            if valid:
+                results.append(result.text)
+        embed.title = "Search Results for \"" + item + "\":"
+        embed.description = ""
+        i = 1
+        for result in results:
+            embed.description += "**" + str(i) + ".** " + result + "\n"
+            i += 1
+            if i >= 6:
+                break
+    else:
+        embed.title = "No results found for \"" + item + "\""
+        output = await message.channel.send(embed=embed)
+        await message.remove_reaction(CLOCK, client.user)
+        await message.add_reaction(ERROR)
+        await asyncio.sleep(5)
+        await output.delete()
+        await message.remove_reaction(ERROR, client.user)
+        return
+    try:
+        output = await message.channel.send(embed=embed)
+        await message.remove_reaction(CLOCK, client.user)
+        await message.add_reaction(QUESTION_MARK)
+        await output.add_reaction("\U00000031\U0000FE0F\U000020E3")
+        await output.add_reaction("\U00000032\U0000FE0F\U000020E3")
+        await output.add_reaction("\U00000033\U0000FE0F\U000020E3")
+        await output.add_reaction("\U00000034\U0000FE0F\U000020E3")
+        await output.add_reaction("\U00000035\U0000FE0F\U000020E3")
+        await output.add_reaction("\U0001F5D1")
+    except:
+        await message.channel.send("Something went wrong. Please let the bot"
+                                   " owner know so this can be fixed.")
+        await message.remove_reaction(CLOCK, client.user)
+        await message.add_reaction(ERROR)
+        return
+    try:
+        reaction = await client.wait_for("reaction_add", timeout=1800,
+                                         check=reactsearch)
+    except asyncio.TimeoutError:
+        await output.remove_reaction("\U00000031\U0000FE0F\U000020E3",
+                                     client.user)
+        await output.remove_reaction("\U00000032\U0000FE0F\U000020E3",
+                                     client.user)
+        await output.remove_reaction("\U00000033\U0000FE0F\U000020E3",
+                                     client.user)
+        await output.remove_reaction("\U00000034\U0000FE0F\U000020E3",
+                                     client.user)
+        await output.remove_reaction("\U00000035\U0000FE0F\U000020E3",
+                                     client.user)
+        await output.remove_reaction("\U0001F5D1", client.user)
+    else:
+        await message.remove_reaction(QUESTION_MARK, client.user)
+        if reaction[0].emoji == "delete":
+            await output.delete()
+            await message.add_reaction("\U0001F5D1")
+            await asyncio.sleep(5)
+            await message.remove_reaction("\U0001F5D1", client.user)
+        else:
+            await output.delete()
+            await lookupgbf(resultsearch[reaction[0].emoji - 1], message,
+                            simple)
+
+
+def reactsearch(reaction, user):
+    if user != client.user:
+        if str(reaction.emoji) == "\U00000031\U0000FE0F\U000020E3":
+            reaction.emoji = 1
+            return 1
+        elif str(reaction.emoji) == "\U00000032\U0000FE0F\U000020E3":
+            reaction.emoji = 2
+            return 2
+        elif str(reaction.emoji) == "\U00000033\U0000FE0F\U000020E3":
+            reaction.emoji = 3
+            return 3
+        elif str(reaction.emoji) == "\U00000034\U0000FE0F\U000020E3":
+            reaction.emoji = 4
+            return 4
+        elif str(reaction.emoji) == "\U00000035\U0000FE0F\U000020E3":
+            reaction.emoji = 5
+            return 5
+        elif str(reaction.emoji) == "\U0001F5D1":
+            reaction.emoji = "delete"
+            return "delete"
 
 
 async def lookuplol() -> None:
