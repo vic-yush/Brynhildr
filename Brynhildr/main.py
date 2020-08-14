@@ -484,11 +484,13 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
             await eventparse(categories, page.text, embed, simple)
         else:
             await message.remove_reaction(CLOCK, client.user)
-            await message.add_reaction("<:despair:376080252754984960")
+            await message.add_reaction(ERROR)
             await message.channel.send("<:despair:376080252754984960> This is "
                                        "not a weapon, summon, event, or "
                                        "playable character page. I can't handle"
                                        " those pages right now.")
+            await asyncio.sleep(5)
+            await message.remove_reaction(ERROR, client.user)
             return
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
