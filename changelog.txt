@@ -47,3 +47,11 @@ v1.3
 - Search functionality is now available and will automatically initialize on searches that do not return an existing page
 - Interactive reactions have been added, allowing you to interact with search results and remove lookups once you're done with them if desired
 - More icons added
+v1.3.1
+- Fixed display error with character charge attacks that get an upgrade but keep the same name
+- Fixed reactions applying the react action to all recent messages
+- Fixed search menus sometimes displaying more reaction options than search results found
+- Refined search functionality to only return pages supported by lookup
+- Fixed an edge case where looking up pages with no description (commonly newly added pages) would break lookup
+- Changed bot to summer mode
+- More icons added
