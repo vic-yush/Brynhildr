@@ -12,8 +12,11 @@ async def summonparse(categories: str, source: str, embed: discord.Embed,
     await generateicons(categories, embed)
     # Get description, and change apostrophe escape characters to actual
     # apostrophes
-    description = parsed.find("meta", {"name": "description"})["content"] \
-        .replace("&#039;", "'")
+    if parsed.find("meta", {"name": "description"}):
+        description = parsed.find("meta", {"name": "description"})["content"] \
+            .replace("&#039;", "'")
+    else:
+        description = ""
     # Find summon image
     image = parsed.find("meta", {"property": "og:image"})["content"]
     # Put the basic content together

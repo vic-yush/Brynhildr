@@ -11,9 +11,12 @@ async def characterparse(categories: str, source: str, embed: discord.Embed,
     # Generate icon line
     await generateicons(categories, embed)
     # Get description, and change apostrophe escape characters to actual
-    # apostrophes
-    description = parsed.find("meta", {"name": "description"})["content"] \
-        .replace("&#039;", "'")
+    # apostrophe
+    if parsed.find("meta", {"name": "description"}):
+        description = parsed.find("meta", {"name": "description"})["content"] \
+            .replace("&#039;", "'")
+    else:
+        description = ""
     # Find character image
     image = parsed.find("meta", {"property": "og:image"})["content"]
     # Put the basic content together
@@ -137,38 +140,40 @@ async def generateca(source: str) -> list:
     removetooltip(parsed)
     removecitation(parsed)
     iconreplace(parsed)
-    # Check if the CA eventually gets an upgrade
-    if not parsed.find_all("span", {"class": "skill-upgrade-text"}):
-        upgrade = False
+    # Check if the CA eventually gets another name
+    if len(parsed.find_all("td", {"class": "skill-name"})) > 1:
+        namechange = True
     else:
-        upgrade = True
+        namechange = False
     for tr in parsed.find_all("tr"):
         # If the row has styling, it's a dud row
         if tr.get("style"):
             continue
-        if not upgrade:
-            # If the CA doesn't get an upgrade, the CA name will be listed on
-            # the field title
+        # If the row has a "skill" upgrade, add it in mark it as such, then
+        # Remove it to prevent double inclusion
+        if tr.find("td", {"class": "skill-name"}) and not namechange:
             name = " - " + tr.find("td", {"class": "skill-name"}).text
-            td = tr.find("td", {"style": "text-align:left;"})
-            for br in td.find_all("br"):
-                br.replace_with(" ")
-            outputtext = td.text
-        else:
-            # If the row has a "skill" upgrade, add it in mark it as such, then
-            # Remove it to prevent double inclusion
-            if tr.find("span", {"class": "skill-upgrade-text"}):
-                outputtext += "__" + \
-                              tr.find("span", {"class": "skill-upgrade-text"})\
-                                  .text + "__\n"
+            tr.find("td", {"class": "skill-name"}).replace_with("")
+        if tr.find("span", {"class": "skill-upgrade-text"}):
+            if namechange:
+                outputtext += "__" + tr.find("span", {"class":
+                                             "skill-upgrade-text"}).text + \
+                              "__\n"
                 tr.find("span", {"class": "skill-upgrade-text"})\
                     .replace_with("")
-            # Otherwise, the CA name is listed in the field body.
-            td = tr.find("td", {"style": "text-align:left;"})
-            for br in td.find_all("br"):
-                br.replace_with(" ")
+            else:
+                tr.find("span", {"class": "skill-upgrade-text"}) \
+                    .replace_with("\n__" + tr.find("span", {"class":
+                                  "skill-upgrade-text"}).text + "__\n")
+        td = tr.find("td", {"style": "text-align:left;"})
+        for br in td.find_all("br"):
+            br.replace_with(" ")
+        if namechange:
             outputtext += "**" + tr.find("td", {"class": "skill-name"}).text + \
-                          ":** " + td.text + "\n"
+                      ":** " + td.text + "\n"
+        else:
+            outputtext += td.text
+
     output.append(name)
     output.append(outputtext)
     return output

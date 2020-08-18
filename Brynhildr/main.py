@@ -21,21 +21,27 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
 VERSION = "v1.3"
-AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e37004c" \
-         "30ea82c1d3280792e98.png"
+AVATAROLD = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e370" \
+            "04c30ea82c1d3280792e98.png"
+AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b26f7bd44159e" \
+         "4425a0ec0b4e4095bf4.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
 
 CLOCK = "\U0001F551"
 QUESTION_MARK = "\U00002753"
 CHECK_MARK = "\U00002714"
 ERROR = "\U0000274C"
+REACTIONS = ["\U00000031\U0000FE0F\U000020E3", "\U00000032\U0000FE0F\U000020E3",
+             "\U00000033\U0000FE0F\U000020E3", "\U00000034\U0000FE0F\U000020E3",
+             "\U00000035\U0000FE0F\U000020E3"]
 
 
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
-    activity = discord.Activity(name='the stars',
-                                type=discord.ActivityType.watching)
+    activity = discord.Game(name='on the beach')
+    # activity = discord.Activity(name='the stars',
+    #                             type=discord.ActivityType.watching)
     await client.change_presence(activity=activity)
 
 
@@ -84,11 +90,9 @@ async def changelog(message) -> None:
     Change log. Manually typed because file I/O is effort.
     """
     await message.channel.trigger_typing()
+    await message.add_reaction(CLOCK)
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.0.6", value="- Added character and summon "
-                    "lookup functionality\n- Moved icons below titles",
-                    inline=False)
     embed.add_field(name="v1.0.7", value="- Migrated advanced HTML parsing to "
                     "BeautifulSoup4. This has no effect on what you see, but it"
                     " saves vic a lot of sanity.\n- Weapon lookup now has basic"
@@ -125,11 +129,20 @@ async def changelog(message) -> None:
                     "been added, allowing you to interact with search results "
                     "and remove lookups once you're done with them if desired\n"
                     "- More icons added")
+    embed.add_field(name="v1.3.1", value="- Fixed display error with character "
+                    "charge attacks that get an upgrade but keep the same name"
+                    "\n- Fixed reactions applying the react action to all "
+                    "recent messages\n- Fixed search menus sometimes displaying"
+                    " more reaction options than search results found\n- "
+                    "Refined search functionality to only return pages "
+                    "supported by lookup\n- Fixed an edge case where looking up"
+                    " pages with no description (commonly newly added pages) "
+                    "would break lookup\n- Changed bot to summer mode\n- More "
+                    "icons added")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.timestamp = datetime.datetime.utcnow()
-    await message.channel.send(embed=embed)
-    return
+    await embedsend(message, embed)
 
 
 async def updateannounce(message) -> None:
@@ -160,6 +173,7 @@ async def manual(message) -> None:
     Help page. That's really it.
     """
     await message.channel.trigger_typing()
+    await message.add_reaction(CLOCK)
     embed = discord.Embed()
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
@@ -190,14 +204,13 @@ async def manual(message) -> None:
     embed.add_field(name="Support Server Invite", value="**@Brynhildr discord**"
                     " | DMs an invite to the support server to you.")
     embed.timestamp = datetime.datetime.utcnow()
-    await message.channel.send(embed=embed)
+    await embedsend(message, embed)
 
 
 async def wikihelp(message) -> None:
     await message.channel.trigger_typing()
+    await message.add_reaction(CLOCK)
     embed = discord.Embed()
-    embed.set_author(name="GBF Wiki Lookup",
-                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
     embed.title = "Wiki Lookup Tips"
     embed.description = "The lookup service is built off of the GBF Wiki. A " \
                         "side effect of this is that searches are spelling " \
@@ -235,10 +248,12 @@ async def wikihelp(message) -> None:
                     "return the May 2019 iteration of Unite and Fight, noting "
                     "that that iteration featured Water element enemies.",
                     inline=False)
+    embed.set_author(name="GBF Wiki Lookup",
+                     icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.timestamp = datetime.datetime.utcnow()
-    await message.channel.send(embed=embed)
+    await embedsend(message, embed)
 
 
 async def discordinvite(message)-> None:
@@ -481,12 +496,14 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
         else:
             await message.remove_reaction(CLOCK, client.user)
             await message.add_reaction(ERROR)
-            await message.channel.send("<:despair:376080252754984960> This is "
-                                       "not a weapon, summon, event, or "
-                                       "playable character page. I can't handle"
-                                       " those pages right now.")
+            output = await message.channel.send("<:despair:376080252754984960> "
+                                                "This is not a weapon, summon, "
+                                                "event, or playable character "
+                                                "page. I can't handle those "
+                                                "pages right now.")
             await asyncio.sleep(5)
             await message.remove_reaction(ERROR, client.user)
+            output.delete()
             return
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
@@ -494,37 +511,13 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
     if message.author.is_on_mobile():
         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
                               "Wiki. • Brynhildr " + VERSION + "\nSome links "
-                              "may not display properly on mobile.",
+                              "may not display properly on mobile. • ",
                          icon_url=AVATAR)
     else:
         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
                               "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
-    try:
-        output = await message.channel.send(embed=embed)
-        await message.remove_reaction(CLOCK, client.user)
-        await message.add_reaction(CHECK_MARK)
-        await output.add_reaction("\U0001F5D1")
-    except:
-        await message.channel.send("Something went wrong. Please let the bot"
-                                   " owner know so this can be fixed.")
-        await message.remove_reaction(CLOCK, client.user)
-        await message.add_reaction(ERROR)
-        return
-    try:
-        await client.wait_for("reaction_add", timeout=1800, check=react)
-    except asyncio.TimeoutError:
-        await output.remove_reaction("\U0001F5D1", client.user)
-    else:
-        await message.remove_reaction(CHECK_MARK, client.user)
-        await output.delete()
-        await message.add_reaction("\U0001F5D1")
-        await asyncio.sleep(5)
-        await message.remove_reaction("\U0001F5D1", client.user)
-
-
-def react(reaction, user):
-    return user.id != client.user.id and str(reaction.emoji) == "\U0001F5D1"
+    await embedsend(message, embed)
 
 
 async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
@@ -534,21 +527,27 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
     if message.author.is_on_mobile():
         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
                               "Wiki. • Brynhildr " + VERSION + "\nSome links "
-                              "may not display properly on mobile.",
+                              "may not display properly on mobile. • ",
                          icon_url=AVATAR)
     else:
         embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
                               "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     parsed = BeautifulSoup(source, "html.parser")
+    resultsearch = []
+    results = []
     if not parsed.find("p", {"class": "mw-search-nonefound"}):
-        results = []
-        resultsearch = []
         for result in parsed.find_all("div", {"class":
                                               "mw-search-result-heading"}):
             valid = True
             for a in result.find_all("a"):
-                if a["href"].count("/") > 1:
+                page = requests.get("https://gbf.wiki/" +
+                                    a.text.replace(" ", "_")).text
+                categories = page[page.find("wgCategories") +
+                                  15:].split("]", 1)[0]
+                cases = ["\"Weapons\"", "\"Characters\"", "\"Summons\"",
+                         "\"Events\""]
+                if not any(category in categories for category in cases):
                     valid = False
                     break
                 resultsearch.append(a.text)
@@ -556,6 +555,8 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
                                ")")
             if valid:
                 results.append(result.text)
+            if len(results) == 5:
+                break
         embed.title = "Search Results for \"" + item + "\":"
         embed.description = ""
         i = 1
@@ -577,11 +578,10 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
         output = await message.channel.send(embed=embed)
         await message.remove_reaction(CLOCK, client.user)
         await message.add_reaction(QUESTION_MARK)
-        await output.add_reaction("\U00000031\U0000FE0F\U000020E3")
-        await output.add_reaction("\U00000032\U0000FE0F\U000020E3")
-        await output.add_reaction("\U00000033\U0000FE0F\U000020E3")
-        await output.add_reaction("\U00000034\U0000FE0F\U000020E3")
-        await output.add_reaction("\U00000035\U0000FE0F\U000020E3")
+        i = 0
+        while i < len(results):
+            await output.add_reaction(REACTIONS[i])
+            i += 1
         await output.add_reaction("\U0001F5D1")
     except:
         await message.channel.send("Something went wrong. Please let the bot"
@@ -589,21 +589,35 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
         await message.remove_reaction(CLOCK, client.user)
         await message.add_reaction(ERROR)
         return
+
+    def reactsearch(react, user):
+        if user != client.user and react.message.id == output.id:
+            if str(react.emoji) == "\U00000031\U0000FE0F\U000020E3":
+                react.emoji = 1
+                return 1
+            elif str(react.emoji) == "\U00000032\U0000FE0F\U000020E3":
+                react.emoji = 2
+                return 2
+            elif str(react.emoji) == "\U00000033\U0000FE0F\U000020E3":
+                react.emoji = 3
+                return 3
+            elif str(react.emoji) == "\U00000034\U0000FE0F\U000020E3":
+                react.emoji = 4
+                return 4
+            elif str(react.emoji) == "\U00000035\U0000FE0F\U000020E3":
+                react.emoji = 5
+                return 5
+            elif str(react.emoji) == "\U0001F5D1":
+                react.emoji = "delete"
+                return "delete"
+
     try:
         reaction = await client.wait_for("reaction_add", timeout=1800,
                                          check=reactsearch)
     except asyncio.TimeoutError:
-        await output.remove_reaction("\U00000031\U0000FE0F\U000020E3",
-                                     client.user)
-        await output.remove_reaction("\U00000032\U0000FE0F\U000020E3",
-                                     client.user)
-        await output.remove_reaction("\U00000033\U0000FE0F\U000020E3",
-                                     client.user)
-        await output.remove_reaction("\U00000034\U0000FE0F\U000020E3",
-                                     client.user)
-        await output.remove_reaction("\U00000035\U0000FE0F\U000020E3",
-                                     client.user)
-        await output.remove_reaction("\U0001F5D1", client.user)
+        output = await message.channel.fetch_message(output.id)
+        for reaction in output.reactions:
+            await output.remove_reaction(str(reaction.emoji), client.user)
     else:
         await message.remove_reaction(QUESTION_MARK, client.user)
         if reaction[0].emoji == "delete":
@@ -617,26 +631,34 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
                             simple)
 
 
-def reactsearch(reaction, user):
-    if user != client.user:
-        if str(reaction.emoji) == "\U00000031\U0000FE0F\U000020E3":
-            reaction.emoji = 1
-            return 1
-        elif str(reaction.emoji) == "\U00000032\U0000FE0F\U000020E3":
-            reaction.emoji = 2
-            return 2
-        elif str(reaction.emoji) == "\U00000033\U0000FE0F\U000020E3":
-            reaction.emoji = 3
-            return 3
-        elif str(reaction.emoji) == "\U00000034\U0000FE0F\U000020E3":
-            reaction.emoji = 4
-            return 4
-        elif str(reaction.emoji) == "\U00000035\U0000FE0F\U000020E3":
-            reaction.emoji = 5
-            return 5
-        elif str(reaction.emoji) == "\U0001F5D1":
-            reaction.emoji = "delete"
-            return "delete"
+async def embedsend(message: discord.message, embed: discord.Embed) -> None:
+    try:
+        output = await message.channel.send(embed=embed)
+        await message.remove_reaction(CLOCK, client.user)
+        await message.add_reaction(CHECK_MARK)
+        await output.add_reaction("\U0001F5D1")
+    except:
+        await message.channel.send("Something went wrong. Please let the bot"
+                                   " owner know so this can be fixed.")
+        await message.remove_reaction(CLOCK, client.user)
+        await message.add_reaction(ERROR)
+        return
+
+    def react(reaction, user):
+        return user.id != client.user.id and str(reaction.emoji) == \
+               "\U0001F5D1" and reaction.message.id == output.id
+
+    try:
+        await client.wait_for("reaction_add", timeout=1800,
+                              check=react)
+    except asyncio.TimeoutError:
+        await output.remove_reaction("\U0001F5D1", client.user)
+    else:
+        await message.remove_reaction(CHECK_MARK, client.user)
+        await output.delete()
+        await message.add_reaction("\U0001F5D1")
+        await asyncio.sleep(5)
+        await message.remove_reaction("\U0001F5D1", client.user)
 
 
 async def lookuplol() -> None:
