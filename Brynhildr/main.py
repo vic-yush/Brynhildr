@@ -20,7 +20,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.3"
+VERSION = "v1.3.1"
 AVATAROLD = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e370" \
             "04c30ea82c1d3280792e98.png"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b26f7bd44159e" \
