@@ -49,6 +49,12 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Counter on dodge/damage
         elif img["alt"] == "Status Counter DodgeDMG.png":
             img.replace_with("<:CounterDodgeDMG:745326045393059850>")
+        # Damage cap up
+        elif img["alt"] == "Status DamageCapUp.png":
+            img.replace_with("<:CapUp:730836378702839878>")
+        # Debuff success up
+        elif img["alt"] == "Status DebuffSuccessUp.png":
+            img.replace_with("<:DebuffUp:730836378287603784>")
         # Defense up
         elif img["alt"] == "Status DefenseUp.png":
             img.replace_with("<:DefenseUp:730824577478950933>")
@@ -97,6 +103,9 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Revitalize
         elif img["alt"] == "Status Revitalize.png":
             img.replace_with("<:Revitalize:739609067185504318>")
+        # Routine Step (multistrike)
+        elif img["alt"] == "Status Routine Step.png":
+            img.replace_with("<:MultiStrike:730830371075260557>")
         # Shield
         elif img["alt"] == "Status Shield.png":
             img.replace_with("<:Shield:741019009427963907>")
@@ -177,18 +186,24 @@ def iconreplace(parsed: BeautifulSoup) -> None:
             img.replace_with("<:WindSwitch:743648516538105906>")
 
         # Elemental ATK up
+        # Dark
+        elif img["alt"] == "Status DarkAtkUp.png":
+            img.replace_with("<:DarkAtkUp:741720281751748660>")
         # Earth
         elif img["alt"] == "Status EarthAtkUp.png":
             img.replace_with("<:EarthAtkUp:741720282384826438>")
         # Fire
         elif img["alt"] == "Status FireAtkUp.png":
             img.replace_with("<:FireAtkUp:741720282414186526>")
-        # Water
-        elif img["alt"] == "Status WaterAtkUp.png":
-            img.replace_with("<:WaterAtkUp:741720282640678963>")
         # Light
         elif img["alt"] == "Status LightAtkUp.png":
             img.replace_with("<:LightAtkUp:741720282120847364>")
+        # Water
+        elif img["alt"] == "Status WaterAtkUp.png":
+            img.replace_with("<:WaterAtkUp:741720282640678963>")
+        # Wind
+        elif img["alt"] == "Status WindAtkUp.png":
+            img.replace_with("<:WindAtkUp:741720282472906874>")
 
         # Elemental DEF up
         # Dark
@@ -212,7 +227,10 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Attack down
         elif img["alt"] == "Status AttackDown.png":
             img.replace_with("<:AttackDown:741034514817745006>")
-        # Attack down
+        # Attack down (4 turn)
+        elif img["alt"] == "Status ATK Down 4.png":
+            img.replace_with("<:ATKDown4:745395152939647107>")
+        # Attack down (stackable)
         elif img["alt"] == "Status AttackDownStack.png":
             img.replace_with("<:AttackDownStack:743649616985063424>")
         # Blind
@@ -236,6 +254,9 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Defense down (3 turn)
         elif img["alt"] == "Status DEF Down 3.png":
             img.replace_with("<:DefenseDown3:741033218014314586>")
+        # Defense down (4 turn)
+        elif img["alt"] == "Status DEF Down 4.png":
+            img.replace_with("<:DEFDown4:745395152759160903>")
         # Defense down (stackable)
         elif img["alt"] == "Status DefenseDownStack.png":
             img.replace_with("<:DefenseDownStack:743649616708370513>")
@@ -254,6 +275,7 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Gravity
         elif img["alt"] == "Status Gravity.png":
             img.replace_with("<:Gravity:740984450841575477>")
+        # Healing reduced
         elif img["alt"] == "Status HealDown.png":
             img.replace_with("<:HealDown:741718732954402838>")
         # Hostility up
@@ -265,18 +287,33 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Max HP Down (stackable)
         elif img["alt"] == "Status Max HP Down Stack.png":
             img.replace_with("<:MaxHPDownStack:745338049545764926>")
+        # Paralysis
+        elif img["alt"] == "Status Paralysis.png":
+            img.replace_with("<:Paralysis:745359816981217391>")
         # Petrified
         elif img["alt"] == "Status Petrified.png":
             img.replace_with("<:Petrified:740988150616424581>")
         # Petrified (3 turn)
         elif img["alt"] == "Status Petrified 3.png":
             img.replace_with("<:Petrified3:741033218022572062>")
+        # Petrified (4 turn)
+        elif img["alt"] == "Status Petrified 4.png":
+            img.replace_with("<:Petrified4:745395152553508956>")
         # Poison
         elif img["alt"] == "Status Poison.png":
             img.replace_with("<:Poison:744744941455933462>")
+        # Shorted
+        elif img["alt"] == "Status Sorted.png":
+            img.replace_with("<:Shorted:745393290697769110>")
         # Sleep
         elif img["alt"] == "Status Sleep.png":
             img.replace_with("<:Sleep:741038697323036673>")
+        # Special attack damage lowered (6 turn)
+        elif img["alt"] == "Status SA DMG Lowered 6.png":
+            img.replace_with("<:SADMGLowered6:745400447690473544>")
+        # Stun
+        elif img["alt"] == "Status Stun.png":
+            img.replace_with("<:Quack:745360657335058513>")
         # Triple Attack down
         elif img["alt"] == "Status TripleDown.png":
             img.replace_with("<:TripleDown6:741037392437182524>")

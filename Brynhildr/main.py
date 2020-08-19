@@ -20,7 +20,7 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.3.1"
+VERSION = "v1.3.2"
 AVATAROLD = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e370" \
             "04c30ea82c1d3280792e98.png"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b26f7bd44159e" \
@@ -93,11 +93,6 @@ async def changelog(message) -> None:
     await message.add_reaction(CLOCK)
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.0.7", value="- Migrated advanced HTML parsing to "
-                    "BeautifulSoup4. This has no effect on what you see, but it"
-                    " saves vic a lot of sanity.\n- Weapon lookup now has basic"
-                    " Charge Attack information. Please let vic know if "
-                    "something is missing an icon!", inline=False)
     embed.add_field(name="v1.1", value="- HUGE update!\n- Finalized migrating "
                     "advanced HTML parsing to BS4\n- Added 4/5★ uncap stars\n"
                     "- Characters obtainable via Premium Draw now have their "
@@ -128,7 +123,7 @@ async def changelog(message) -> None:
                     " return an existing page\n- Interactive reactions have "
                     "been added, allowing you to interact with search results "
                     "and remove lookups once you're done with them if desired\n"
-                    "- More icons added")
+                    "- More icons added", inline=False)
     embed.add_field(name="v1.3.1", value="- Fixed display error with character "
                     "charge attacks that get an upgrade but keep the same name"
                     "\n- Fixed reactions applying the react action to all "
@@ -138,7 +133,11 @@ async def changelog(message) -> None:
                     "supported by lookup\n- Fixed an edge case where looking up"
                     " pages with no description (commonly newly added pages) "
                     "would break lookup\n- Changed bot to summer mode\n- More "
-                    "icons added")
+                    "icons added", inline=False)
+    embed.add_field(name="v1.3.2", value="- Reconfigured summon calls to "
+                    "prevent text fields exceeding the maximum length allowed "
+                    "by Discord with certain summons (Freyr)\n- More icons "
+                    "added", inline=False)
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.timestamp = datetime.datetime.utcnow()
@@ -493,6 +492,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
             await summonparse(categories, page.text, embed, simple)
         elif "\"Events\"" in categories:
             await eventparse(categories, page.text, embed, simple)
+        # Page type not supported
         else:
             await message.remove_reaction(CLOCK, client.user)
             await message.add_reaction(ERROR)
@@ -508,14 +508,9 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
-    if message.author.is_on_mobile():
-        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-                              "Wiki. • Brynhildr " + VERSION + "\nSome links "
-                              "may not display properly on mobile. • ",
-                         icon_url=AVATAR)
-    else:
-        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-                              "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
+    embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki. •"
+                     " Brynhildr " + VERSION + "\nSome links may not display "
+                     "properly on mobile. • ", icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     await embedsend(message, embed)
 
@@ -524,23 +519,20 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
                     simple: bool) -> None:
     embed.set_author(name="GBF Wiki Lookup",
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
-    if message.author.is_on_mobile():
-        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-                              "Wiki. • Brynhildr " + VERSION + "\nSome links "
-                              "may not display properly on mobile. • ",
-                         icon_url=AVATAR)
-    else:
-        embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF "
-                              "Wiki. • Brynhildr " + VERSION, icon_url=AVATAR)
+    embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki. •"
+                     " Brynhildr " + VERSION + "\nSome links may not display "
+                     "properly on mobile. • ", icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     parsed = BeautifulSoup(source, "html.parser")
     resultsearch = []
     results = []
+    # Check if search can find anything
     if not parsed.find("p", {"class": "mw-search-nonefound"}):
         for result in parsed.find_all("div", {"class":
                                               "mw-search-result-heading"}):
             valid = True
             for a in result.find_all("a"):
+                # Check if result is supported by lookup
                 page = requests.get("https://gbf.wiki/" +
                                     a.text.replace(" ", "_")).text
                 categories = page[page.find("wgCategories") +
@@ -550,11 +542,14 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
                 if not any(category in categories for category in cases):
                     valid = False
                     break
+                # Collect a duplicate for later use
                 resultsearch.append(a.text)
+                # Format text
                 a.replace_with("[" + a.text + "](https://gbf.wiki" + a["href"] +
                                ")")
             if valid:
                 results.append(result.text)
+            # Collect first 5 valid results
             if len(results) == 5:
                 break
         embed.title = "Search Results for \"" + item + "\":"
@@ -565,6 +560,7 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
             i += 1
             if i >= 6:
                 break
+    # Case for if no valid results are found
     if parsed.find("p", {"class": "mw-search-nonefound"}) or not resultsearch:
         embed.title = "No results found for \"" + item + "\""
         output = await message.channel.send(embed=embed)
@@ -590,6 +586,8 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
         await message.add_reaction(ERROR)
         return
 
+    # Verify that the reaction was for the right message and is one of the
+    # indicated types
     def reactsearch(react, user):
         if user != client.user and react.message.id == output.id:
             if str(react.emoji) == "\U00000031\U0000FE0F\U000020E3":
@@ -611,13 +609,16 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
                 react.emoji = "delete"
                 return "delete"
 
+    # Wait for reaction
     try:
         reaction = await client.wait_for("reaction_add", timeout=1800,
                                          check=reactsearch)
+    # Abandon check after 30 minutes
     except asyncio.TimeoutError:
         output = await message.channel.fetch_message(output.id)
         for reaction in output.reactions:
             await output.remove_reaction(str(reaction.emoji), client.user)
+    # Apply lookup to the new selected search term
     else:
         await message.remove_reaction(QUESTION_MARK, client.user)
         if reaction[0].emoji == "delete":
