@@ -510,7 +510,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
     embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki. •"
                      " Brynhildr " + VERSION + "\nSome links may not display "
-                     "properly on mobile. • ", icon_url=AVATAR)
+                     "properly on mobile. ", icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     await embedsend(message, embed)
 
@@ -521,7 +521,7 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
     embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki. •"
                      " Brynhildr " + VERSION + "\nSome links may not display "
-                     "properly on mobile. • ", icon_url=AVATAR)
+                     "properly on mobile. ", icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     parsed = BeautifulSoup(source, "html.parser")
     resultsearch = []
