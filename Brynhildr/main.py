@@ -503,7 +503,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                                                 "pages right now.")
             await asyncio.sleep(5)
             await message.remove_reaction(ERROR, client.user)
-            output.delete()
+            await output.delete()
             return
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
