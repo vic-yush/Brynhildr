@@ -2,12 +2,13 @@ import asyncio
 import discord
 import dateparser
 import datetime
+import os
 import pytz
 import re
 import requests
 from bs4 import BeautifulSoup
-from event import eventparse
 from character import characterparse
+from event import eventparse
 from summon import summonparse
 from weapon import weaponparse
 
@@ -20,11 +21,10 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "okay brynhild")
 GBF = ["lookup gbf", "look up gbf"]
 LEAGUE = ["lookup lol", "look up lol"]
-VERSION = "v1.3.2"
-AVATAROLD = "https://cdn.discordapp.com/avatars/729790460175843368/c6c040e370" \
-            "04c30ea82c1d3280792e98.png"
-AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b26f7bd44159e" \
-         "4425a0ec0b4e4095bf4.png"
+# TODO: Change once done
+VERSION = "v1.3.3"
+AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b1b7f6ac0220d" \
+         "63a6ad934c9950d698d.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
 
 CLOCK = "\U0001F551"
@@ -93,18 +93,6 @@ async def changelog(message) -> None:
     await message.add_reaction(CLOCK)
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.1", value="- HUGE update!\n- Finalized migrating "
-                    "advanced HTML parsing to BS4\n- Added 4/5★ uncap stars\n"
-                    "- Characters obtainable via Premium Draw now have their "
-                    "recruitment weapon listed\n- Weapons now have their skills"
-                    " and charge attacks included in lookup\n- Characters now "
-                    "have their charge attacks, skills, and subskills listed\n"
-                    "- Summons now have their auras and calls listed\n- Simple "
-                    "lookup is now available with the \"lookupsimple\" command,"
-                    " since the normal lookup command is getting rather big\n "
-                    "- Lazy lookup is now available by surrounding your search "
-                    "query with [], or s[] if you'd like simple lookup",
-                    inline=False)
     embed.add_field(name="v1.1.1", value="- Fixed formatting errors on help "
                     "page\n- Fixed Ultima Weapons sneaking past the large skill"
                     " table check and breaking the bot\n- More icons added",
@@ -138,6 +126,9 @@ async def changelog(message) -> None:
                     "prevent text fields exceeding the maximum length allowed "
                     "by Discord with certain summons (Freyr)\n- More icons "
                     "added", inline=False)
+    embed.add_field(name="v1.3.3", value="- Fixed issue causing lookup of Proto"
+                    " Bahamut to fail\n- Minor error message changes\n- Changed"
+                    " bot out of summer mode", inline=False)
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.timestamp = datetime.datetime.utcnow()
@@ -503,7 +494,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                                                 "pages right now.")
             await asyncio.sleep(5)
             await message.remove_reaction(ERROR, client.user)
-            await output.delete()
+            output.delete()
             return
     embed.url = url
     embed.set_author(name="GBF Wiki Lookup",
@@ -530,25 +521,22 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
     if not parsed.find("p", {"class": "mw-search-nonefound"}):
         for result in parsed.find_all("div", {"class":
                                               "mw-search-result-heading"}):
-            valid = True
-            for a in result.find_all("a"):
-                # Check if result is supported by lookup
-                page = requests.get("https://gbf.wiki/" +
-                                    a.text.replace(" ", "_")).text
-                categories = page[page.find("wgCategories") +
-                                  15:].split("]", 1)[0]
-                cases = ["\"Weapons\"", "\"Characters\"", "\"Summons\"",
-                         "\"Events\""]
-                if not any(category in categories for category in cases):
-                    valid = False
-                    break
-                # Collect a duplicate for later use
-                resultsearch.append(a.text)
-                # Format text
-                a.replace_with("[" + a.text + "](https://gbf.wiki" + a["href"] +
-                               ")")
-            if valid:
-                results.append(result.text)
+            a = result.find("a")
+            # Check if result is supported by lookup
+            page = requests.get("https://gbf.wiki/" +
+                                a.text.replace(" ", "_")).text
+            categories = page[page.find("wgCategories") +
+                              15:].split("]", 1)[0]
+            cases = ["\"Weapons\"", "\"Characters\"", "\"Summons\"",
+                     "\"Events\"", "\"Items\""]
+            if not any(category in categories for category in cases):
+                continue
+            # Collect a duplicate for later use
+            resultsearch.append(a.text)
+            # Format text
+            a.replace_with("[" + a.text + "](https://gbf.wiki" + a["href"] +
+                           ")")
+            results.append(result.text)
             # Collect first 5 valid results
             if len(results) == 5:
                 break
@@ -579,9 +567,10 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
             await output.add_reaction(REACTIONS[i])
             i += 1
         await output.add_reaction("\U0001F5D1")
-    except:
+    except Exception as e:
         await message.channel.send("Something went wrong. Please let the bot"
-                                   " owner know so this can be fixed.")
+                                   " owner know so this can be fixed.\nError "
+                                   "details: " + e.__str__())
         await message.remove_reaction(CLOCK, client.user)
         await message.add_reaction(ERROR)
         return
@@ -638,9 +627,10 @@ async def embedsend(message: discord.message, embed: discord.Embed) -> None:
         await message.remove_reaction(CLOCK, client.user)
         await message.add_reaction(CHECK_MARK)
         await output.add_reaction("\U0001F5D1")
-    except:
+    except Exception as e:
         await message.channel.send("Something went wrong. Please let the bot"
-                                   " owner know so this can be fixed.")
+                                   " owner know so this can be fixed.\nError "
+                                   "details: " + e.__str__())
         await message.remove_reaction(CLOCK, client.user)
         await message.add_reaction(ERROR)
         return
@@ -667,4 +657,4 @@ async def lookuplol() -> None:
     return
 
 
-client.run(TOKEN)
+client.run(DISCORD_TOKEN)
