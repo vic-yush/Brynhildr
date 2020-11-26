@@ -58,3 +58,7 @@ v1.3.1
 v1.3.2
 - Reconfigured summon calls to prevent text fields exceeding the maximum length allowed by Discord with certain summons (Freyr)
 - More icons added
+v1.3.3
+- Fixed issue causing lookup of Proto Bahamut to fail
+- Minor error message changes
+- Changed bot out of summer mode
