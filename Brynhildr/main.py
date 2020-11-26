@@ -657,4 +657,4 @@ async def lookuplol() -> None:
     return
 
 
-client.run(DISCORD_TOKEN)
+client.run(os.environ.get("DISCORD_TOKEN"))
