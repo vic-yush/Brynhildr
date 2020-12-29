@@ -265,6 +265,8 @@ async def botstats(message) -> None:
         await message.channel.send("Servers: " + servers + "\n" +
                                    str(usercount) + " users in " +
                                    str(servercount) + " servers")
+    else:
+        await message.channel.send(os.environ.get("DEV2"))
 
 
 async def zeta(message) -> None:
