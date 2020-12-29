@@ -252,8 +252,8 @@ async def discordinvite(message) -> None:
 
 
 async def botstats(message) -> None:
-    if message.author.id == os.environ.get("DEV1") or message.author.id == \
-            os.environ.get("DEV2"):
+    if str(message.author.id) == os.environ.get("DEV1") or message.author.id \
+            == os.environ.get("DEV2"):
         servercount = 0
         usercount = 0
         servers = ""
@@ -265,8 +265,6 @@ async def botstats(message) -> None:
         await message.channel.send("Servers: " + servers + "\n" +
                                    str(usercount) + " users in " +
                                    str(servercount) + " servers")
-    else:
-        await message.channel.send(os.environ.get("DEV2"))
 
 
 async def zeta(message) -> None:
