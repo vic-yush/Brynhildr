@@ -21,7 +21,7 @@ Reminder|@Brynhildr remindme (action) (time)| Basic reminder function. Warning: 
 GBF Lookup| @Brynhildr lookup (item)| Lookup of pages from the GBF wiki. Currently, only weapon, summon, event, and playable character lookup is supported.
 Simple GBF Lookup|@Brynhildr lookupsimple (item)| Lookup of pages from the GBF wiki, with less information and in a smaller embed. Currently, only weapon, summon, event, and  playable character lookup is supported.
 Lazy GBF Lookup |[(item)] anywhere in your message; s[(item)] for simple lookup| Functionally identical to normal lookup, but less effort to use.
-Help Page|@Brynhildr#9768 help|Brings up the help page.
+Help Page|@Brynhildr help|Brings up the help page.
 Wiki Lookup Tips|@Brynhildr wikihelp|A separate help page just for GBF Wiki lookup, with tips on finding the specific page you want.
 Support Server Invite|@Brynhildr discord|DMs an invite to the support server to you.
 
