@@ -252,8 +252,8 @@ async def discordinvite(message) -> None:
 
 
 async def botstats(message) -> None:
-    if str(message.author.id) == os.environ.get("DEV1") or message.author.id \
-            == os.environ.get("DEV2"):
+    if str(message.author.id) == os.environ.get("DEV1") or \
+            str(message.author.id) == os.environ.get("DEV2"):
         servercount = 0
         usercount = 0
         servers = ""
