@@ -19,10 +19,7 @@ ERRORMESSAGE = "<:despair:376080252754984960> Sorry, I couldn't understand th" \
 MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
             "okay brynhild")
-GBF = ["lookup gbf", "look up gbf"]
-LEAGUE = ["lookup lol", "look up lol"]
-# TODO: Change once done
-VERSION = "v1.3.3"
+VERSION = "v1.3.4"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b1b7f6ac0220d" \
          "63a6ad934c9950d698d.png"
 TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
@@ -39,9 +36,9 @@ REACTIONS = ["\U00000031\U0000FE0F\U000020E3", "\U00000032\U0000FE0F\U000020E3",
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
-    activity = discord.Game(name='on the beach')
-    # activity = discord.Activity(name='the stars',
-    #                             type=discord.ActivityType.watching)
+    # activity = discord.Game(name='on the beach')
+    activity = discord.Activity(name='the stars',
+                                type=discord.ActivityType.watching)
     await client.change_presence(activity=activity)
 
 
@@ -49,11 +46,11 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    if re.search("s\[(.*)\]", message.content):
-        await lookup(re.search("s\[(.*)\]", message.content).group(1), message,
+    if re.search("s\[(.+)]", message.content):
+        await lookup(re.search("s\[(.+)]", message.content).group(1), message,
                      True, True)
-    elif re.search("\[(.*)\]", message.content):
-        await lookup(re.search("\[(.*)\]", message.content).group(1), message,
+    elif re.search("\[(.+)]", message.content):
+        await lookup(re.search("\[(.+)]", message.content).group(1), message,
                      False, True)
     if message.content.lower().startswith(MENTIONS) or client.user in \
             message.mentions:
@@ -93,10 +90,6 @@ async def changelog(message) -> None:
     await message.add_reaction(CLOCK)
     embed = discord.Embed()
     embed.title = "Change Log"
-    embed.add_field(name="v1.1.1", value="- Fixed formatting errors on help "
-                    "page\n- Fixed Ultima Weapons sneaking past the large skill"
-                    " table check and breaking the bot\n- More icons added",
-                    inline=False)
     embed.add_field(name="v1.2", value="- Event lookup is now available (event "
                     "lookup is in an early state, and may produce errors)\n- "
                     "Help page updated to now include the command for the help "
@@ -128,7 +121,11 @@ async def changelog(message) -> None:
                     "added", inline=False)
     embed.add_field(name="v1.3.3", value="- Fixed issue causing lookup of Proto"
                     " Bahamut to fail\n- Minor error message changes\n- Changed"
-                    " bot out of summer mode", inline=False)
+                    " bot out of summer mode",
+                    inline=False)
+    embed.add_field(name="v1.3.4", value="- Added new icons for character "
+                    "categories\n- Minor regex improvements\n- More icons "
+                    "added", inline=False)
     embed.set_footer(icon_url=AVATAR, text="Brynhildr " + VERSION +
                                            " • Made with ♥ by vicyush#4018")
     embed.timestamp = datetime.datetime.utcnow()
@@ -150,7 +147,7 @@ async def updateannounce(message) -> None:
         embed.description = "Brynhildr Bot has been updated to " + VERSION + \
                             ". No work is needed on your part, this is just a" \
                             " notification. Version " + VERSION + " brings " \
-                            "the following changes:\n\n" + update + "\n\n" +\
+                            "the following changes:\n\n" + update + "\n\n" + \
                             "Thank you for using Brynhildr Bot.\n[Support " \
                             "server](https://discord.gg/3uRTuMU)"
         embed.timestamp = datetime.datetime.utcnow()
@@ -187,10 +184,11 @@ async def manual(message) -> None:
                     "Functionally identical to normal lookup, but less effort "
                     "to use.", inline=False)
     embed.add_field(name="Help Page", value="**@Brynhildr#9768 help** | Brings "
-                    "up the help page.", inline=False)
+                                            "up the help page.", inline=False)
     embed.add_field(name="Wiki Lookup Tips", value="**@Brynhildr wikihelp** | "
                     "A separate help page just for GBF Wiki lookup, with tips "
-                    "on finding the specific page you want.", inline=False)
+                    "on finding the specific page you want.",
+                    inline=False)
     embed.add_field(name="Support Server Invite", value="**@Brynhildr discord**"
                     " | DMs an invite to the support server to you.")
     embed.timestamp = datetime.datetime.utcnow()
@@ -206,17 +204,18 @@ async def wikihelp(message) -> None:
                         "side effect of this is that searches are spelling " \
                         "and case sensitive, among other peculiarities:"
     embed.add_field(name="If a character has multiple versions, its oldest or "
-                    "lowest-rarity version usually gets the \"base\" name",
+                         "lowest-rarity version usually gets the \"base\" name",
                     value="For example, searching only \"Vira\" will return the"
-                    " SR version of her.", inline=False)
+                          " SR version of her.", inline=False)
     embed.add_field(name="If a character also exists as a summon or event, the "
-                    "character page usually gets the \"base\" name",
+                         "character page usually gets the \"base\" name",
                     value="For example, searching only \"Grimnir\" will return "
-                    "the playable character, and not the summon.", inline=False)
+                          "the playable character, and not the summon.",
+                    inline=False)
     embed.add_field(name="When specifying a specific version, enclose the "
-                    "specification in parentheses",
+                         "specification in parentheses",
                     value="For example, to specify Baal the summon, search "
-                    "\"Baal (Summon)\".", inline=False)
+                          "\"Baal (Summon)\".", inline=False)
     embed.add_field(name="Some cases can be tricky",
                     value="For example, searching \"Robomi (Event)\" will "
                     "return the SR event character, while \"Robomi (Side Story)"
@@ -246,20 +245,26 @@ async def wikihelp(message) -> None:
     await embedsend(message, embed)
 
 
-async def discordinvite(message)-> None:
+async def discordinvite(message) -> None:
     await message.author.send("Here is the invite to the Brynhildr Bot support "
                               "server, as you requested:\n"
                               "https://discord.gg/3uRTuMU")
 
 
 async def botstats(message) -> None:
-    if message.author.id == 438711930408927233 or message.author.id == \
-            262236299832983582:
+    if message.author.id == os.environ.get("DEV1") or message.author.id == \
+            os.environ.get("DEV2"):
+        servercount = 0
+        usercount = 0
         servers = ""
         for server in client.guilds:
             servers += server.name + ", "
+            servercount += 1
+            usercount += server.member_count
         servers = servers[:-1]
-        await message.channel.send("Servers: " + servers)
+        await message.channel.send("Servers: " + servers + "\n" +
+                                   str(usercount) + " users in " +
+                                   str(servercount) + " servers")
 
 
 async def zeta(message) -> None:
@@ -501,7 +506,8 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
     embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki. •"
                      " Brynhildr " + VERSION + "\nSome links may not display "
-                     "properly on mobile. ", icon_url=AVATAR)
+                                               "properly on mobile. ",
+                     icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     await embedsend(message, embed)
 
@@ -512,7 +518,8 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
                      icon_url="https://gbf.wiki/images/1/18/Vyrnball.png?0704c")
     embed.set_footer(text="Brynhildr Bot is not affiliated with the GBF Wiki. •"
                      " Brynhildr " + VERSION + "\nSome links may not display "
-                     "properly on mobile. ", icon_url=AVATAR)
+                                               "properly on mobile. ",
+                     icon_url=AVATAR)
     embed.timestamp = datetime.datetime.utcnow()
     parsed = BeautifulSoup(source, "html.parser")
     resultsearch = []
@@ -528,7 +535,7 @@ async def gbfsearch(item: str, source: str, message, embed: discord.Embed,
             categories = page[page.find("wgCategories") +
                               15:].split("]", 1)[0]
             cases = ["\"Weapons\"", "\"Characters\"", "\"Summons\"",
-                     "\"Events\"", "\"Items\""]
+                     "\"Events\""]
             if not any(category in categories for category in cases):
                 continue
             # Collect a duplicate for later use
@@ -650,11 +657,6 @@ async def embedsend(message: discord.message, embed: discord.Embed) -> None:
         await message.add_reaction("\U0001F5D1")
         await asyncio.sleep(5)
         await message.remove_reaction("\U0001F5D1", client.user)
-
-
-async def lookuplol() -> None:
-    # I'm working on it, I swear.
-    return
 
 
 client.run(os.environ.get("DISCORD_TOKEN"))

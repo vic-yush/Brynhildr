@@ -61,6 +61,29 @@ async def generateicons(categories: str, embed: discord.Embed) \
         text += " <:Light:730845600915914873>"
     elif "Dark Characters" in categories:
         text += " <:Dark:730845600613924954>"
+    # Assign category icons. Check each, as multiple options can co-exist
+    if "Summer Characters" in categories:
+        text += " <:Summer:793505682250661929>"
+    if "Yukata Characters" in categories:
+        text += " <:Yukata:793506721817034763>"
+    if "Valentine Characters" in categories:
+        text += " <:Valentine:793507530185768980>"
+    if "Halloween Premium Draw Characters" in categories:
+        text += " <:Halloween:793508939723309058>"
+    if "Holiday Premium Draw Characters" in categories:
+        text += " <:Holiday:793509924922720287>"
+    if "Zodiac Characters" in categories:
+        text += " <:Zodiac:793510822282133565>"
+    if "Grand Series Characters" in categories:
+        text += " <:Grand:793511553026359316>"
+    if "Fantasy Characters" in categories:
+        text += " <:Fantasy:793511553134624788>"
+    if "Collaboration Characters" in categories:
+        text += " <:TieIn:793504971173527582>"
+    if "The Eternals" in categories:
+        text += " <:Eternals:793503906347876362>"
+    if "Arcarum Evokers" in categories:
+        text += " <:Evokers:793501266054479913>"
     # Assign race icons. Check each race, as multirace options (unfortunately)
     # exist
     if "Draph Characters" in categories:

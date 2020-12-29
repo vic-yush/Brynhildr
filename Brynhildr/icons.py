@@ -40,6 +40,9 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Charge attack damage up (1 time)
         elif img["alt"] == "Status C.A. DMG Boosted (1 time).png":
             img.replace_with("<:CAUp1:744316047510994964>")
+        # Charge attack damage up (1 time)
+        elif img["alt"] == "Status C.A. Reactivation.png":
+            img.replace_with("<:CARe:730830371125592114>")
         # Charge bar effects
         elif img["alt"] == "Status Uplift.png":
             img.replace_with("<:ChargeBar:730532683364434092>")
@@ -135,6 +138,11 @@ def iconreplace(parsed: BeautifulSoup) -> None:
             img.replace_with("<:Veil:741033069548404819>")
 
         # Crests
+        # Aurora
+        elif img["alt"] == "Status Aurora Crest 1.png":
+            img.replace_with("<:Aurora:740327163961540679>")
+        elif img["alt"] == "Status Aurora Crest.png":
+            img.replace_with("<:Aurora:740327163961540679>")
         # Deluge
         elif img["alt"] == "Status Deluge Crest 1.png":
             img.replace_with("<:Deluge:740327164364324904>")
