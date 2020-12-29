@@ -1,10 +1,6 @@
 Brynhildr Bot
 =
 
-.. image:: https://discord.com/api/guilds/376066328873664516/embed.png
-:target: https://discord.gg/3uRTuMU
-:alt: Discord server invite
-
 GBF Wiki lookup on Discord, made easy
 
 Features
@@ -15,7 +11,7 @@ Features
 
 Installation
 -
-Click [here](https://discord.com/api/oauth2/authorize?client_id=729790460175843368&permissions=346112&scope=bot) and then follow the instructions to add Brynhildr to your server. It's as simple as that!
+Click [here](https://discord.com/api/oauth2/authorize?client_id=729790460175843368&permissions=346112&scope=bot) and then follow the instructions to add Brynhildr to your server. It's as simple as that.
 
 Commands
 -
@@ -28,3 +24,8 @@ Lazy GBF Lookup |[(item)] anywhere in your message; s[(item)] for simple lookup|
 Help Page|@Brynhildr#9768 help|Brings up the help page.
 Wiki Lookup Tips|@Brynhildr wikihelp|A separate help page just for GBF Wiki lookup, with tips on finding the specific page you want.
 Support Server Invite|@Brynhildr discord|DMs an invite to the support server to you.
+
+Contact
+-
+- [@vicyush on Twitter](https://twitter.com/vicyush)
+- [Support server](https://discord.gg/3uRTuMU)
