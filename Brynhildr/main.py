@@ -22,7 +22,6 @@ MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
 VERSION = "v1.3.4"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b1b7f6ac0220d" \
          "63a6ad934c9950d698d.png"
-TOKEN = "NzI5NzkwNDYwMTc1ODQzMzY4.XwON_A.sXcW5jkXUSr3o3jvRTXXljBvZzg"
 
 CLOCK = "\U0001F551"
 QUESTION_MARK = "\U00002753"
@@ -35,7 +34,7 @@ REACTIONS = ["\U00000031\U0000FE0F\U000020E3", "\U00000032\U0000FE0F\U000020E3",
 
 @client.event
 async def on_ready():
-    print("We have logged in as {0.user}".format(client))
+    print("Logged in as {0.user}".format(client))
     # activity = discord.Game(name='on the beach')
     activity = discord.Activity(name='the stars',
                                 type=discord.ActivityType.watching)
@@ -133,8 +132,8 @@ async def changelog(message) -> None:
 
 
 async def updateannounce(message) -> None:
-    if message.author.id == 438711930408927233 or message.author.id == \
-            262236299832983582:
+    if str(message.author.id) == os.environ.get("DEV1") or \
+            str(message.author.id) == os.environ.get("DEV2"):
         owners = []
         update = message.content[message.content.find("announce") + 8:]
         for server in client.guilds:
