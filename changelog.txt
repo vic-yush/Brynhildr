@@ -62,3 +62,7 @@ v1.3.3
 - Fixed issue causing lookup of Proto Bahamut to fail
 - Minor error message changes
 - Changed bot out of summer mode
+v1.3.4
+- Added new icons for character categories
+- Minor regex improvements
+- More icons added
