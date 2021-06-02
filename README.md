@@ -11,7 +11,7 @@ Features
 
 Installation
 -
-Click [here](https://discord.com/api/oauth2/authorize?client_id=729790460175843368&permissions=346112&scope=bot) and then follow the instructions to add Brynhildr to your server. It's as simple as that.
+Click [here](https://discord.com/api/oauth2/authorize?client_id=729790460175843368&permissions=355392&scope=bot) and then follow the instructions to add Brynhildr to your server. It's as simple as that.
 
 Commands
 -
