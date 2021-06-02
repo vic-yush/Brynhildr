@@ -47,7 +47,7 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         'Status DefenseUp.png': '<:DefenseUp:730824577478950933>',
         # Defense up (stackable)
         'Status DefenseUpStack.png': '<:DefenseUpStack:745336776817639465>',
-        # "Defiance" (Azir)
+        # "Defiance" (Asir!)
         'Status Defiance.png': '<:Azir:730830371049963681>',
         # Dispel cancel
         'Status Dispel Cancel.png': '<:DispelCancel:730836378367164560>',
@@ -107,6 +107,9 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Hellfire
         'Status Hellfire Crest 1.png': '<:Hellfire:740327164544811038>',
         'Status Hellfire Crest.png': '<:Hellfire:740327164544811038>',
+        # Oblivion
+        'Status Oblivion Crest 1.png': '<:Oblivion:740327163953414276>',
+        'Status Oblivion Crest.png': '<:Oblivion:740327163953414276>',
         # Typhoon
         'Status Typhoon Crest 1.png': '<:Typhoon:740327164385427557>',
         'Status Typhoon Crest.png': '<:Typhoon:740327164385427557>',
@@ -118,12 +121,22 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         'Status CriticalUp.png': '<:CriticalUp:741028610697068584>',
         # Critical up (Dark)
         'Status CriticalUpDark.png': '<:CriticalUpDark:741028610432958654>',
+        # Critical up (Earth)
+        'Status CriticalUpEarth.png': '<:CriticalUpEarth:741028610441216011>',
+        # Critical up (Fire)
+        'Status CriticalUpFire.png': '<:CriticalUpFire:741028610508456107>',
+        # Critical up (Light)
+        'Status CriticalUpLight.png': '<:CriticalUpLight:741028610109866067>',
         # Critical up (Water)
         'Status CriticalUpWater.png': '<:CriticalUpWater:741028610433089698>',
+        # Critical up (Wind)
+        'Status CriticalUpWind.png': '<:CriticalUpWind:741028610273706001>',
 
         # Damage cuts
         # 50%
         'Status Dmg Cut 50.png': '<:DC50:730870761178529862>',
+        # 70%
+        'Status Dmg Cut 70.png': '<:DC70:730870760800911413>',
         # Fire (70%)
         'Status Fire Cut 70.png': '<:FC70:730877406604296213>',
         # Water (20%)
@@ -132,6 +145,16 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         'Status Wind Cut 40.png': '<:GC40:730884667007434793>',
 
         # Element Switches
+        # Dark
+        'Status Dark Switch.png': '<:DarkSwitch:743648516433379350>',
+        # Earth
+        'Status Earth Switch.png': '<:EarthSwitch:743648516450287677>',
+        # Fire
+        'Status Fire Switch.png': '<:FireSwitch:743648516575985695>',
+        # Light
+        'Status Light Switch.png': '<:LightSwitch:743648516517134336>',
+        # Water
+        'Status Water Switch.png': '<:WaterSwitch:743648516622254121>',
         # Wind
         'Status Wind Switch.png': '<:WindSwitch:743648516538105906>',
 
@@ -150,17 +173,27 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         'Status WindAtkUp.png': '<:WindAtkUp:741720282472906874>',
 
         # Elemental DEF up
-        'Status DarkResUp.png': '<:DarkResUp:730840334363525130>',  # Dark
-        'Status FireResUp.png': '<:FireResUp:730840334401142874>',  # Fire
+        # Dark
+        'Status DarkResUp.png': '<:DarkResUp:730840334363525130>',
+        # Earth
+        'Status EarthResUp.png': '<:EarthResUp:730840334392885258>',
+        # Fire
+        'Status FireResUp.png': '<:FireResUp:730840334401142874>',
+        # Light
+        'Status LightResUp.png': '<:LightResUp:730840334447280278>',
+        # Water
+        'Status WaterResUp.png': '<:WaterResUp:730840334367457342>',
+        # Wind
+        'Status WindResUp.png': '<:WindResUp:730840334170587198>',
 
-        # DEBUFFS
-        # Acccuracy lowered (2 turn)
+        # Debuffs
+        # Accuracy lowered (2 turn)
         'Status Accuracy Lowered 2.png':
             '<:AccuracyLowered2:745330950006636626>',
-        # Acccuracy lowered (3 turn)
+        # Accuracy lowered (3 turn)
         'Status Accuracy Lowered 3.png':
             '<:AccuracyLowered3:741718281291038838>',
-        # Acccuracy lowered (6 turn)
+        # Accuracy lowered (6 turn)
         'Status Accuracy Lowered 6.png':
             '<:AccuracyLowered6:741037392391045161>',
         # Attack down
@@ -232,6 +265,10 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         # Elemental ATK down
         # Dark
         'Status DarkAtkDown.png': '<:DarkAtkDown:743944410563084389>',
+        # Earth
+        'Status EarthAtkDown.png': '<:EarthAtkDown:743944410479329291>',
+        # Fire
+        'Status FireAtkDown.png': '<:FireAtkDown:743944410726662275>',
         # Light
         'Status LightAtkDown.png': '<:LightAtkDown:743944410613415987>',
         # Water
@@ -240,12 +277,16 @@ def iconreplace(parsed: BeautifulSoup) -> None:
         'Status WindAtkDown.png': '<:WindAtkDown:743944410542243951>',
 
         # Elemental DEF down
-        # Earth
-        'Status EarthResDown.png': '<:EarthResDown:744294130062196836>',
         # Dark
         'Status DarkResDown.png': '<:DarkResDown:744294129923784746>',
+        # Earth
+        'Status EarthResDown.png': '<:EarthResDown:744294130062196836>',
+        # Fire
+        'Status FireResDown.png': '<:FireResDown:744294130028642405>',
         # Light
         'Status LightResDown.png': '<:LightResDown:744294130028511253>',
+        # Water
+        'Status WaterResDown.png': '<:WaterResDown:744294129747361813>',
         # Water (stackable)
         'Status WaterDEFDownStack.png':
             '<:WaterDEFDownStack:744306047426101327>',

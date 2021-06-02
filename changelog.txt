@@ -66,3 +66,9 @@ v1.3.4
 - Added new icons for character categories
 - Minor regex improvements
 - More icons added
+v1.3.5
+- Internal code refactoring, shouldn't impact functionality but makes the code way less ugly
+v1.4
+- Added support for characters with multiple skill tables
+- Fixed new Evoker EMPs breaking lookup
+- More icons added
