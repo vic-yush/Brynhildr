@@ -9,6 +9,9 @@ DOMAIN = "Domain Bonus Ability"
 
 async def characterparse(categories: list, source: str, embed: discord.Embed,
                          simple: bool) -> discord.Embed():
+    # Trim off any potential fascimile compatibility tables
+    if source.find("id=\"Facsimile_Compatibility\""):
+        source = source[:source.find("id=\"Facsimile_Compatibility\"")]
     parsed = BeautifulSoup(source, 'html.parser')
     embed2 = discord.Embed()
     # Generate the title of the embed
