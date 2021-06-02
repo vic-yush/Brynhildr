@@ -463,7 +463,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
     page = requests.get(url)
     # Create embed(s)
     embed = discord.Embed()
-    embed2 = discord.Embed()
+    embed2 = None
     # Check if the input returns a valid page
     if "There is currently no text in this page." in page.text:
         url = "https://gbf.wiki/index.php?search=" + item.replace(" ", "+")
@@ -694,7 +694,14 @@ async def embedsend(message: discord.message, embed: discord.Embed,
                     state = 2
                 if reaction[1] != client.user:
                     if reaction[0].emoji == 1:
-                        await output.remove_reaction("🔄", reaction[1])
-
+                        try:
+                            await output.remove_reaction("🔄", reaction[1])
+                        except discord.errors.Forbidden:
+                            await message.channel.send("I am missing the "
+                                                       "\"Manage Messages\" "
+                                                       "permission in this "
+                                                       "server/channel. Please "
+                                                       "ask a moderator to "
+                                                       "grant this permission.")
 
 client.run(os.environ.get("DISCORD_TOKEN"))
