@@ -512,7 +512,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
                                "Wiki. • Brynhildr " + VERSION + "\nSome links "
                                "may not display properly on mobile. ",
                           icon_url=AVATAR)
-    embed.timestamp = datetime.datetime.utcnow()
+        embed2.timestamp = datetime.datetime.utcnow()
     await embedsend(message, embed, embed2)
 
 
@@ -644,8 +644,7 @@ async def embedsend(message: discord.message, embed: discord.Embed,
         await message.remove_reaction(CLOCK, client.user)
         await message.add_reaction(CHECK_MARK)
         if multi:
-            await output.add_reaction(ONE)
-            await output.add_reaction(TWO)
+            await output.add_reaction("🔄")
         await output.add_reaction("\U0001F5D1")
     except Exception as e:
         await message.channel.send("Something went wrong. Please let the bot"
@@ -659,12 +658,9 @@ async def embedsend(message: discord.message, embed: discord.Embed,
     # indicated types
     def reactsearch(react, user):
         if user != client.user and react.message.id == output.id:
-            if str(react.emoji) == ONE and multi:
+            if str(react.emoji) == "🔄" and multi:
                 react.emoji = 1
                 return 1
-            elif str(react.emoji) == TWO and multi:
-                react.emoji = 2
-                return 2
             elif str(react.emoji) == "\U0001F5D1":
                 react.emoji = "delete"
                 return "delete"
@@ -693,14 +689,12 @@ async def embedsend(message: discord.message, embed: discord.Embed,
                 if reaction[0].emoji == 1 and state == 2:
                     await output.edit(embed=embed)
                     state = 1
-                elif reaction[0].emoji == 2 and state == 1:
+                elif reaction[0].emoji == 1 and state == 1:
                     await output.edit(embed=embed2)
                     state = 2
                 if reaction[1] != client.user:
                     if reaction[0].emoji == 1:
-                        await output.remove_reaction(ONE, reaction[1])
-                    else:
-                        await output.remove_reaction(TWO, reaction[1])
+                        await output.remove_reaction("🔄", reaction[1])
 
 
 client.run(os.environ.get("DISCORD_TOKEN"))

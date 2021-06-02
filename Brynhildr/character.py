@@ -221,8 +221,9 @@ async def generateskills(source, multiskill: bool) -> list:
     for tr in source.find_all("tr"):
         if tr.find_all("th") or tr.get("class"):
             if multiskill and tr.find("th", {"colspan": "6"}):
-                output.append((tr.find("th", {"colspan": "6"}).text, "See "
-                              "other page for more skills"))
+                output.append((tr.find("th", {"colspan": "6"}).text, "Press "
+                              "the :arrows_counterclockwise: reaction to see "
+                               "this character's other skills"))
             continue
         # Get the cell with the skill name
         td = tr.find("td", {"class": "skill-name"})
