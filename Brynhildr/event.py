@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import discord
 from util import *
 
