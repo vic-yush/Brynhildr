@@ -72,3 +72,5 @@ v1.4
 - Added support for characters with multiple skill tables
 - Fixed new Evoker EMPs breaking lookup
 - More icons added
+v1.4.1
+- Fixed certain weapons still managing to have skill tables too long for Discord embeds and overhauled how these cases are handled (thanks for the tip, Jed!); weapons with very long skill tables should now be split into two embed pages that can be toggled like with characters that have two skill tables
