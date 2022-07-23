@@ -704,4 +704,4 @@ async def embedsend(message: discord.message, embed: discord.Embed,
                                                        "ask a moderator to "
                                                        "grant this permission.")
 
-client.run("NzI5MzkyNDIwNzA1NDAzMDEw.GobglU.qnIRD6tjf-cZZksJ0Imr7UXkG5-Kqnap1nM6hQ")
+client.run(os.environ.get("DISCORD_TOKEN"))
