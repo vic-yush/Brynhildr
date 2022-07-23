@@ -1,12 +1,14 @@
 import discord
+import copy
 from icons import iconreplace
 from util import *
 
 BIG = ["Draconic Weapons", "Ultima Weapons", "Dark Opus Weapons"]
+TEXT_LIMIT = 1024
 
 
 async def weaponparse(categories: list, source: str, embed: discord.Embed,
-                      simple: bool) -> None:
+                      simple: bool) -> discord.Embed():
     parsed = BeautifulSoup(source, 'html.parser')
     # Generate the title of the embed
     embed.title = source[source.find("wgTitle") + 10:].split('"', 1)[0]
@@ -31,15 +33,24 @@ async def weaponparse(categories: list, source: str, embed: discord.Embed,
         # Generate the CA field of the embed
         chargeattack = await generateca(source)
         # Generate the skills field of the embed
+        # Some weapons have a lot of skill data that's too large for Discord embed fields, so this does a basic check
+        # to see if the weapon being looked up is one of those weapons. Another check takes place in the actual
+        # function, and a second string is generated to hold the extra skill data if this is the case.
         if any(x in categories for x in BIG):
-            skills = await generateskills(parsed, True)
+            (skills1, skills2) = await generateskills(parsed, True)
         else:
-            skills = await generateskills(parsed, False)
+            (skills1, skills2) = await generateskills(parsed, False)
         # Put the advanced content together
         embed.add_field(name="Obtain", value=obtain, inline=True)
         embed.add_field(name="Charge Attack: " + chargeattack[0],
                         value=chargeattack[1], inline=True)
-        embed.add_field(name="Skills", value=skills, inline=False)
+        if skills2 is not None:
+            embed2 = copy.deepcopy(embed)
+            embed2.add_field(name="Skills", value=skills2, inline=False)
+        embed.add_field(name="Skills", value=skills1, inline=False)
+        if skills2 is not None:
+            return embed2
+    return None
 
 
 async def generateicons(categories: list, embed) -> None:
@@ -139,10 +150,11 @@ async def generateca(source) -> list:
     return [name, output]
 
 
-async def generateskills(parsed: BeautifulSoup, big: bool) -> str:
+async def generateskills(parsed: BeautifulSoup, big: bool) -> (str, str):
     # Trim to only what's needed
     parsed = parsed.find("table", {"class": "wikitable weapon-skills"})
     output = ""
+    split = 0
     # Remove citations
     removecitation(parsed)
     # Generate the output
@@ -167,12 +179,15 @@ async def generateskills(parsed: BeautifulSoup, big: bool) -> str:
             output += tr.find("td", {"class": "skill-name"}).text.strip() + \
                 ": " + tr.find("td", {"class": "skill-desc"}).text + "\n"
         # Skill upgrade/unlock information
+        # Secondary detection to see if the skills will be too long to fit in a single embed, if so, the point where
+        # the output will be too long is marked for splitting later.
         elif "skill-upgrade-text" in tr["class"]:
             if "skill-unlock" in tr["class"] and big or "alternate" in \
-                    tr["class"] and big:
-                output += "Remaining skills too large to display. Check the " \
-                          "wiki for full details."
-                return output
+                    tr["class"] and split == 0:
+                split = len(output)
             else:
                 output += "__" + tr.find_all("td")[1].text + "__\n"
-    return output
+    if split == 0:
+        return output, None
+    else:
+        return output[:split], output[split:]

@@ -475,7 +475,7 @@ async def lookupgbf(item: str, message, simple: bool) -> None:
         categories = page.text[page.text.find("wgCategories") +
                                15:].split("]", 1)[0].strip("\"").split("\",\"")
         if "Weapons" in categories:
-            await weaponparse(categories, page.text, embed, simple)
+            embed2 = await weaponparse(categories, page.text, embed, simple)
         elif "Characters" in categories:
             embed2 = await characterparse(categories, page.text, embed, simple)
         elif "Summons" in categories:
@@ -704,4 +704,4 @@ async def embedsend(message: discord.message, embed: discord.Embed,
                                                        "ask a moderator to "
                                                        "grant this permission.")
 
-client.run(os.environ.get("DISCORD_TOKEN"))
+client.run("NzI5MzkyNDIwNzA1NDAzMDEw.GobglU.qnIRD6tjf-cZZksJ0Imr7UXkG5-Kqnap1nM6hQ")
