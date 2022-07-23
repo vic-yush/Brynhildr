@@ -19,7 +19,7 @@ ERRORMESSAGE = "<:despair:376080252754984960> Sorry, I couldn't understand th" \
 MENTIONS = ("hey bryn", "hey brynhildr", "hey brynhild", "hi bryn",
             "hi brynhildr", "hi brynhild", "okay bryn", "okay brynhildr",
             "okay brynhild")
-VERSION = "v1.4"
+VERSION = "v1.4.1"
 AVATAR = "https://cdn.discordapp.com/avatars/729790460175843368/b1b7f6ac0220d" \
          "63a6ad934c9950d698d.png"
 
