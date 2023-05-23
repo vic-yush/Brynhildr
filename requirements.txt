@@ -1,5 +1,5 @@
 discord.py
 dateparser==0.7.6
 pytz==2020.1
-requests==2.24.0
+requests==2.31.0
 bs4
